@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boîte à outils</title>
+<meta name="description" content="Outils en ligne pour le pilotage et la gestion en établissement.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --encre:#1B2A33;
+    --papier:#FBFAF7;
+    --ardoise:#5C6B73;
+    --trait:#DDD8CE;
+    --sceau:#2E5E4E;
+    --sceau-clair:#E8F0EC;
+    --ocre:#8A6A2F;
+    --ocre-clair:#F5EEDF;
+
+    --display:'Fraunces',Georgia,serif;
+    --corps:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+
+    --marge:clamp(1.25rem,5vw,4rem);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+
+  html{-webkit-text-size-adjust:100%}
+
+  body{
+    margin:0;
+    background:var(--papier);
+    color:var(--encre);
+    font-family:var(--corps);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .enveloppe{
+    max-width:64rem;
+    margin:0 auto;
+    padding:0 var(--marge);
+  }
+
+  /* ---------- En-tête ---------- */
+
+  .bandeau{
+    border-bottom:1px solid var(--trait);
+    padding:clamp(3rem,8vw,5.5rem) 0 clamp(2rem,5vw,3rem);
+  }
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:.7rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ardoise);
+    margin:0 0 1.25rem;
+  }
+
+  .bandeau h1{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(2.4rem,6vw,3.8rem);
+    line-height:1.08;
+    letter-spacing:-.02em;
+    margin:0 0 1.5rem;
+    max-width:16ch;
+  }
+
+  .bandeau .intro{
+    max-width:52ch;
+    color:var(--ardoise);
+    font-size:1.05rem;
+    margin:0 0 2rem;
+  }
+
+  .signature{
+    font-family:var(--mono);
+    font-size:.78rem;
+    color:var(--ardoise);
+    border-left:2px solid var(--sceau);
+    padding-left:.9rem;
+    line-height:1.7;
+  }
+  .signature strong{
+    display:block;
+    color:var(--encre);
+    font-weight:500;
+  }
+
+  /* ---------- Filtres ---------- */
+
+  .filtres{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+    padding:1.75rem 0;
+    border-bottom:1px solid var(--trait);
+  }
+
+  .filtre{
+    font-family:var(--mono);
+    font-size:.75rem;
+    letter-spacing:.04em;
+    color:var(--ardoise);
+    background:none;
+    border:1px solid var(--trait);
+    border-radius:2px;
+    padding:.4rem .8rem;
+    cursor:pointer;
+    transition:border-color .15s,color .15s,background .15s;
+  }
+  .filtre:hover{border-color:var(--ardoise);color:var(--encre)}
+  .filtre[aria-pressed="true"]{
+    background:var(--encre);
+    border-color:var(--encre);
+    color:var(--papier);
+  }
+  .filtre:focus-visible{
+    outline:2px solid var(--sceau);
+    outline-offset:2px;
+  }
+
+  /* ---------- Liste ---------- */
+
+  .liste{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+
+  .outil{
+    border-bottom:1px solid var(--trait);
+  }
+
+  .outil a.bloc{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:.75rem;
+    padding:2.25rem 0;
+    text-decoration:none;
+    color:inherit;
+    transition:background .18s;
+  }
+  .outil a.bloc:hover{
+    background:linear-gradient(90deg,rgba(46,94,78,.045),transparent 70%);
+  }
+  .outil a.bloc:focus-visible{
+    outline:2px solid var(--sceau);
+    outline-offset:-2px;
+  }
+
+  @media(min-width:46rem){
+    .outil a.bloc{
+      grid-template-columns:11rem 1fr;
+      gap:2.5rem;
+      align-items:start;
+    }
+  }
+
+  .meta{
+    font-family:var(--mono);
+    font-size:.72rem;
+    letter-spacing:.06em;
+    color:var(--ardoise);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:.6rem;
+  }
+  @media(min-width:46rem){
+    .meta{
+      display:block;
+      padding-top:.45rem;
+    }
+    .meta .categorie{display:block;margin-bottom:.55rem}
+  }
+
+  .badge{
+    display:inline-block;
+    padding:.15rem .5rem;
+    border-radius:2px;
+    font-size:.68rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .badge.en-ligne{background:var(--sceau-clair);color:var(--sceau)}
+  .badge.en-test{background:var(--ocre-clair);color:var(--ocre)}
+  .badge.a-venir{background:#EFEDE8;color:var(--ardoise)}
+
+  .contenu h2{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:1.4rem;
+    line-height:1.25;
+    letter-spacing:-.01em;
+    margin:0 0 .5rem;
+    display:flex;
+    align-items:baseline;
+    gap:.55rem;
+  }
+
+  .fleche{
+    font-size:.95rem;
+    color:var(--sceau);
+    transition:transform .18s;
+    flex-shrink:0;
+  }
+  .outil a.bloc:hover .fleche{transform:translateX(4px)}
+
+  .contenu p{
+    margin:0 0 .65rem;
+    max-width:62ch;
+    color:#3E4C54;
+  }
+
+  .contenu .usage{
+    font-size:.88rem;
+    color:var(--ardoise);
+    font-style:italic;
+    margin:0;
+  }
+
+  /* ---------- Pied ---------- */
+
+  .pied{
+    padding:3rem 0 4rem;
+    font-family:var(--mono);
+    font-size:.74rem;
+    color:var(--ardoise);
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    gap:1rem;
+  }
+  .pied a{color:var(--ardoise)}
+
+  .vide{
+    padding:3rem 0;
+    color:var(--ardoise);
+    font-size:.95rem;
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="bandeau">
+  <div class="enveloppe">
+    <p class="eyebrow">Outils en ligne</p>
+    <h1 id="titre-page">Boîte à outils</h1>
+    <p class="intro" id="intro"></p>
+    <div class="signature" id="signature"></div>
+  </div>
+</header>
+
+<nav class="enveloppe" aria-label="Filtrer par domaine">
+  <div class="filtres" id="filtres"></div>
+</nav>
+
+<main class="enveloppe">
+  <ul class="liste" id="liste"></ul>
+  <p class="vide" id="vide" hidden>Aucun outil dans ce domaine pour le moment.</p>
+</main>
+
+<footer class="pied enveloppe">
+  <span id="compteur"></span>
+  <span>Mise à jour&nbsp;: <span id="maj"></span></span>
+</footer>
+
+<script>
+const LIBELLES = {
+  "en-ligne": "En ligne",
+  "en-test":  "En test",
+  "a-venir":  "À venir"
+};
+
+let donnees = null;
+let filtreActif = "tous";
+
+function echapper(s){
+  return String(s).replace(/[&<>"']/g, c =>
+    ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function formaterDate(iso){
+  if(!iso) return "";
+  const [a,m] = iso.split("-");
+  const mois = ["janv.","févr.","mars","avr.","mai","juin",
+                "juil.","août","sept.","oct.","nov.","déc."];
+  return m ? `${mois[parseInt(m,10)-1]} ${a}` : a;
+}
+
+function rendreEntete(){
+  const p = donnees.profil || {};
+  if(p.intro) document.getElementById("intro").textContent = p.intro;
+  const sig = document.getElementById("signature");
+  sig.innerHTML =
+    (p.nom ? `<strong>${echapper(p.nom)}</strong>` : "") +
+    [p.fonction, p.etablissement].filter(Boolean).map(echapper).join("<br>");
+}
+
+function rendreFiltres(){
+  const cats = [...new Set(donnees.outils.map(o => o.categorie).filter(Boolean))].sort();
+  const box = document.getElementById("filtres");
+  box.innerHTML = "";
+  [["tous","Tous"], ...cats.map(c => [c,c])].forEach(([val,lib]) => {
+    const b = document.createElement("button");
+    b.className = "filtre";
+    b.type = "button";
+    b.textContent = lib;
+    b.setAttribute("aria-pressed", String(val === filtreActif));
+    b.addEventListener("click", () => { filtreActif = val; rendreFiltres(); rendreListe(); });
+    box.appendChild(b);
+  });
+}
+
+function rendreListe(){
+  const liste = document.getElementById("liste");
+  const visibles = donnees.outils
+    .filter(o => filtreActif === "tous" || o.categorie === filtreActif)
+    .sort((a,b) => (b.date || "").localeCompare(a.date || ""));
+
+  liste.innerHTML = visibles.map(o => {
+    const statut = o.statut || "en-ligne";
+    return `
+    <li class="outil">
+      <a class="bloc" href="${echapper(o.url)}">
+        <div class="meta">
+          <span class="categorie">${echapper(o.categorie || "")}</span>
+          <span class="badge ${echapper(statut)}">${echapper(LIBELLES[statut] || statut)}</span>
+        </div>
+        <div class="contenu">
+          <h2>${echapper(o.titre)} <span class="fleche" aria-hidden="true">&rarr;</span></h2>
+          <p>${echapper(o.description || "")}</p>
+          ${o.usage ? `<p class="usage">${echapper(o.usage)}</p>` : ""}
+        </div>
+      </a>
+    </li>`;
+  }).join("");
+
+  document.getElementById("vide").hidden = visibles.length > 0;
+
+  const n = donnees.outils.length;
+  document.getElementById("compteur").textContent =
+    n + (n > 1 ? " outils publiés" : " outil publié");
+
+  const recente = donnees.outils
+    .map(o => o.date).filter(Boolean).sort().pop();
+  document.getElementById("maj").textContent = formaterDate(recente);
+}
+
+fetch("outils.json")
+  .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+  .then(d => { donnees = d; rendreEntete(); rendreFiltres(); rendreListe(); })
+  .catch(() => {
+    document.getElementById("liste").innerHTML =
+      `<li class="vide">La liste des outils n'a pas pu être chargée.
+       Vérifiez que le fichier <code>outils.json</code> est présent
+       à côté de <code>index.html</code>.</li>`;
+  });
+</script>
+</body>
+</html>

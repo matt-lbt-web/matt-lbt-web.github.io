@@ -1,0 +1,37 @@
+{
+  "profil": {
+    "nom": "Mathieu L.",
+    "fonction": "Directeur adjoint",
+    "etablissement": "EPLEFPA de Marmilhat",
+    "intro": "Des outils construits pour répondre à des besoins concrets de pilotage et de gestion en établissement. Chacun est utilisable directement dans le navigateur, sans installation."
+  },
+  "outils": [
+    {
+      "titre": "Sociogramme des services",
+      "description": "Représente les relations de service entre enseignants à partir des fiches de service. Le graphe se manipule directement : filtrage par discipline, isolement d'un nœud, export de l'image.",
+      "usage": "Préparation de la répartition de service et lecture des interdépendances d'équipe.",
+      "url": "https://matt-lbt-web.github.io/sociogramme/",
+      "categorie": "Pilotage RH",
+      "statut": "en-ligne",
+      "date": "2026-03"
+    },
+    {
+      "titre": "Demande de modification d'emploi du temps",
+      "description": "Formulaire de saisie des demandes de modification, avec circuit de validation et traçabilité. Conforme aux exigences RGPD sur la conservation et l'accès aux données.",
+      "usage": "Remplace les échanges par courriel et centralise les demandes en un point unique.",
+      "url": "https://matt-lbt-web.github.io/emploi-du-temps/",
+      "categorie": "Organisation",
+      "statut": "en-test",
+      "date": "2026-05"
+    },
+    {
+      "titre": "Guide du dossier bancaire",
+      "description": "Parcours guidé de constitution d'un dossier de financement : pièces attendues, ordre de présentation, points de vigilance à chaque étape.",
+      "usage": "Accompagnement des porteurs de projet avant un rendez-vous bancaire.",
+      "url": "https://matt-lbt-web.github.io/dossier-bancaire/",
+      "categorie": "Gestion financière",
+      "statut": "en-ligne",
+      "date": "2026-01"
+    }
+  ]
+}
