@@ -358,7 +358,7 @@ function rendreListe(){
   document.getElementById("maj").textContent = formaterDate(recente);
 }
 
-fetch("outils.json")
+fetch("outils.json?v=" + Date.now())
   .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
   .then(d => { donnees = d; rendreEntete(); rendreFiltres(); rendreListe(); })
   .catch(() => {
