@@ -1,13 +1,13 @@
 {
   "profil": {
-    "nom": "Mathieu L.",
-    "fonction": "Directeur adjoint",
-    "etablissement": "EPLEFPA de Marmilhat",
+    "nom": "Matthias Lombart.",
+    "fonction": "Directeur adjoint (Proviseur adjoint)",
+    "etablissement": "Campus Marmilhat (EPLEFPA de Clermont Ferrand)",
     "intro": "Des outils construits pour répondre à des besoins concrets de pilotage et de gestion en établissement. Chacun est utilisable directement dans le navigateur, sans installation."
   },
   "outils": [
     {
-      "titre": "Sociogramme des services",
+      "titre": "Outil 1 blablabla",
       "description": "Représente les relations de service entre enseignants à partir des fiches de service. Le graphe se manipule directement : filtrage par discipline, isolement d'un nœud, export de l'image.",
       "usage": "Préparation de la répartition de service et lecture des interdépendances d'équipe.",
       "url": "https://matt-lbt-web.github.io/sociogramme/",
@@ -25,7 +25,7 @@
       "date": "2026-05"
     },
     {
-      "titre": "Guide du dossier bancaire",
+      "titre": "Guide du dossier demande de financement",
       "description": "Parcours guidé de constitution d'un dossier de financement : pièces attendues, ordre de présentation, points de vigilance à chaque étape.",
       "usage": "Accompagnement des porteurs de projet avant un rendez-vous bancaire.",
       "url": "https://matt-lbt-web.github.io/dossier-bancaire/",
