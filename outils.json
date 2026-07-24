@@ -3,12 +3,36 @@
     "nom": "Matthias Lombart.",
     "fonction": "Directeur adjoint (Proviseur adjoint)",
     "etablissement": "Campus Marmilhat (EPLEFPA de Clermont Ferrand)",
-    "intro": "Des outils construits pour répondre à des besoins concrets de pilotage et de gestion en établissement. Chacun est utilisable directement dans le navigateur, sans installation."
+    "intro": "Retrouvez ici des outils construits pour répondre à vos besoins concrets de pilotage et de gestion en établissement."
   },
   "outils": [
     {
-      "titre": "Outil 1 blablabla",
-      "description": "Représente les relations de service entre enseignants à partir des fiches de service. Le graphe se manipule directement : filtrage par discipline, isolement d'un nœud, export de l'image.",
+      "titre": "Generateur de calendrier de classe",
+      "description": "Et si construire le calendrier de classe ne prenait plus que quelques minutes ?
+
+À chaque rentrée, les équipes pédagogiques passent un temps précieux à reconstruire à la main le calendrier prévisionnel de leur classe : stages individuels et collectifs, immersions sur les exploitations du lycée, examens, voyages d'étude… Un travail utile, mais fastidieux et source d'erreurs.
+
+Concrètement, les enseignants PP / Coordo regroupent l'ensemble des informations et établissent le calendrier final. Selon leurs compétences, certains utilisent un tableur, d'autres le font sur papier. À mon tour, je réalise la synthèse du calendrier de chaque classe (une trentaine) pour établir le calendrier scolaire présenté au Conseil d'Administration.
+
+L'ensemble du processus, par la multiplicité des intervenants et la diversité des outils utilisés, est à la fois fastidieux et source d'erreurs.
+
+Mon objectif : développer pour les enseignants un outil simple, au format HTML, qui s'ouvre dans un navigateur, sans installation ni donnée personnelle (RGPD compatible). J'utilise l'IA Claude. 
+
+L'outil est structuré en 4 étapes :
+
+1 · Les paramètres (image 1). On renseigne l'année scolaire, la classe et la zone de vacances. D'un clic, les congés officiels et les jours fériés se placent automatiquement.
+
+2 · Les événements (image 1). On ajoute les temps forts propres à la filière — stages en entreprise, immersions sur l'exploitation du campus, CCF, périodes d'examen, voyages. La saisie des dates est simple et la légende est uniformisée pour toutes les classes.
+
+3 · L'aperçu (image 2). Le calendrier annuel s'affiche instantanément sur une seule page, lisible et prêt à imprimer. Il se remplit au fur et à mesure des saisies. Ce que l'on voit est exactement ce qui sortira en PDF pour être partagé.
+
+4 · La sauvegarde (image 3). Les données se conservent (PDF et CSV). À tout moment, on recharge le fichier dans l'outil et on ne corrige que ce qui doit l'être. Il est possible de supprimer chaque saisie ligne par ligne. 
+
+Il s'agit d'une première version, qui connaîtra sûrement quelques ajustements après les tests de l'équipe pédagogique.
+
+👉 L'outil dans sa version actuelle est disponible en commentaire.
+
+Prochaine étape (image 4): développer un outil complémentaire qui fusionnera automatiquement l'ensemble des calendriers de classe pour générer le calendrier scolaire présenté en instance!",
       "usage": "Préparation de la répartition de service et lecture des interdépendances d'équipe.",
       "url": "https://matt-lbt-web.github.io/sociogramme/",
       "categorie": "Pilotage RH",
