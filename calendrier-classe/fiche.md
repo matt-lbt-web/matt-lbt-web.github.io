@@ -16,7 +16,7 @@ Un outil simple, au format HTML, qui s'ouvre dans un navigateur. Pas d'installat
 
 On renseigne l'année scolaire, la classe et la zone de vacances. D'un clic, les congés officiels et les jours fériés se placent automatiquement.
 
-![Écran de saisie des paramètres et des événements](../images/images/calendrier-classe-1.png)
+![Écran de saisie des paramètres et des événements](images/calendrier-classe-1.png)
 *Les paramètres et la saisie des événements sur un même écran.*
 
 ### 2 · Les événements
@@ -27,14 +27,14 @@ On ajoute les temps forts propres à la filière : stages en entreprise, immersi
 
 Le calendrier annuel s'affiche sur une seule page, lisible et prêt à imprimer. Il se remplit au fur et à mesure des saisies : ce que l'on voit à l'écran est exactement ce qui sortira en PDF.
 
-![Aperçu du calendrier annuel sur une page](../images/images/calendrier-classe-2.png)
+![Aperçu du calendrier annuel sur une page](images/calendrier-classe-2.png)
 *L'aperçu se met à jour à chaque saisie.*
 
 ### 4 · La sauvegarde
 
 Les données s'exportent en PDF pour le partage et en CSV pour la reprise. À tout moment, on recharge le fichier dans l'outil et on ne corrige que ce qui doit l'être. Chaque saisie reste supprimable ligne par ligne.
 
-![Écran d'export et de rechargement](../images/images/calendrier-classe-3.png)
+![Écran d'export et de rechargement](images/calendrier-classe-3.png)
 *Export PDF pour diffuser, CSV pour reprendre le travail plus tard.*
 
 ## État d'avancement
@@ -45,5 +45,5 @@ Il s'agit d'une première version, qui connaîtra des ajustements après les tes
 
 Un outil complémentaire est en préparation : il fusionnera automatiquement l'ensemble des calendriers de classe pour générer le calendrier scolaire présenté en instance.
 
-![Principe de la fusion des calendriers de classe](../images/images/calendrier-classe-4.png)
+![Principe de la fusion des calendriers de classe](images/calendrier-classe-4.png)
 *Principe envisagé pour la consolidation des calendriers.*
