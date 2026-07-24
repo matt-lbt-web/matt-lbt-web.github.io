@@ -1,36 +1,36 @@
 {
   "profil": {
     "nom": "Matthias Lombart",
-    "fonction": "Directeur adjoint (Proviseur adjoint)",
-    "etablissement": "Campus Marmilhat (EPLEFPA de Clermont-Ferrand)",
-    "intro": "Retrouvez ici des outils construits pour répondre à vos besoins concrets de pilotage et de gestion en établissement."
+    "fonction": "Directeur adjoint",
+    "etablissement": "Campus Marmilhat · EPLEFPA de Clermont-Ferrand",
+    "note": "outils autonomes, sans installation ni collecte de données",
+    "intro": "Des outils construits pour répondre à des besoins concrets de pilotage et de gestion en établissement. Chacun s'ouvre dans le navigateur, sans installation."
   },
   "outils": [
     {
+      "dossier": "calendrier-classe",
       "titre": "Générateur de calendrier de classe",
-      "description": "Construit le calendrier prévisionnel annuel d'une classe en quelques minutes : congés et jours fériés placés automatiquement, puis saisie des temps forts de la filière. Export PDF prêt à imprimer et CSV rechargeable.",
-      "usage": "Destiné aux professeurs principaux et coordonnateurs, en amont de la synthèse présentée au conseil d'administration.",
-      "url": "https://matt-lbt-web.github.io/calendrier-classe/",
-      "fiche": "calendrier-classe",
-      "vignette": "images/calendrier-classe-1.png",
+      "description": "Construit le calendrier prévisionnel annuel d'une classe en quelques minutes : congés et jours fériés placés automatiquement selon la zone, puis saisie des temps forts de la filière. Le calendrier s'exporte en PDF prêt à imprimer, et se recharge tel quel pour ne corriger que ce qui change.",
+      "usage": "Professeurs principaux et coordonnateurs, en amont de la synthèse présentée au conseil d'administration.",
+      "vignette": "images/apercu.png",
       "categorie": "Organisation",
       "statut": "en-test",
       "date": "2026-07"
     },
     {
+      "dossier": "emploi-du-temps",
       "titre": "Demande de modification d'emploi du temps",
       "description": "Formulaire de saisie des demandes de modification, avec circuit de validation et traçabilité. Conforme aux exigences RGPD sur la conservation et l'accès aux données.",
       "usage": "Remplace les échanges par courriel et centralise les demandes en un point unique.",
-      "url": "https://matt-lbt-web.github.io/emploi-du-temps/",
       "categorie": "Organisation",
       "statut": "a-venir",
       "date": "2026-05"
     },
     {
+      "dossier": "dossier-financement",
       "titre": "Guide de la demande de financement",
       "description": "Parcours guidé de constitution d'un dossier de financement : pièces attendues, ordre de présentation, points de vigilance à chaque étape.",
       "usage": "Accompagnement des porteurs de projet avant un rendez-vous bancaire.",
-      "url": "https://matt-lbt-web.github.io/dossier-bancaire/",
       "categorie": "Gestion financière",
       "statut": "a-venir",
       "date": "2026-01"

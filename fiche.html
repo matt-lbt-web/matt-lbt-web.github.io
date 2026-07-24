@@ -6,133 +6,114 @@
 <title>Fiche outil — Boîte à outils</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --encre:#1B2A33;
-    --papier:#FBFAF7;
-    --ardoise:#5C6B73;
-    --trait:#DDD8CE;
-    --sceau:#2E5E4E;
-    --sceau-clair:#E8F0EC;
-    --ocre:#8A6A2F;
-    --ocre-clair:#F5EEDF;
+    --papier:#FAF8F2;
+    --carreau:#F4F1E9;
+    --reglure:#E9E5DA;
+    --encre:#201E19;
+    --texte:#4F4A41;
+    --gris:#6E6759;
+    --gris-clair:#8A8377;
+    --plan:#2B4C7E;
+    --plan-clair:#E4EAF3;
+    --creme:#F2EFE6;
     --display:'Fraunces',Georgia,serif;
     --corps:'Inter',system-ui,sans-serif;
-    --mono:'IBM Plex Mono',monospace;
+    --mono:'JetBrains Mono','IBM Plex Mono',monospace;
     --marge:clamp(1.25rem,5vw,4rem);
   }
   *,*::before,*::after{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
   body{
-    margin:0;background:var(--papier);color:var(--encre);
-    font-family:var(--corps);font-size:16px;line-height:1.65;
-    -webkit-font-smoothing:antialiased;
+    margin:0;color:var(--encre);font-family:var(--corps);
+    font-size:16px;line-height:1.68;-webkit-font-smoothing:antialiased;
+    background-color:var(--papier);
+    background-image:
+      linear-gradient(var(--carreau) 1px,transparent 1px),
+      linear-gradient(90deg,var(--carreau) 1px,transparent 1px),
+      linear-gradient(var(--reglure) 1px,transparent 1px),
+      linear-gradient(90deg,var(--reglure) 1px,transparent 1px);
+    background-size:12px 12px,12px 12px,60px 60px,60px 60px;
   }
   .enveloppe{max-width:46rem;margin:0 auto;padding:0 var(--marge)}
 
-  /* ---------- Fil d'ariane ---------- */
-  .retour{
-    padding:1.75rem 0;
-    border-bottom:1px solid var(--trait);
-  }
+  .retour{padding:1.5rem 0}
   .retour a{
-    font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;
-    color:var(--ardoise);text-decoration:none;
+    font-family:var(--mono);font-size:.73rem;letter-spacing:.04em;
+    color:var(--gris);text-decoration:none;
     display:inline-flex;align-items:center;gap:.45rem;
   }
   .retour a:hover{color:var(--encre)}
-  .retour a:focus-visible{outline:2px solid var(--sceau);outline-offset:3px}
+  .retour a:focus-visible{outline:2px solid var(--plan);outline-offset:3px}
 
-  /* ---------- En-tête de fiche ---------- */
-  .chapeau{padding:clamp(2.5rem,6vw,4rem) 0 2rem}
+  .chapeau{padding:1rem 0 2rem;border-top:1px solid var(--reglure)}
   .surtitre{
-    font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--ardoise);
-    margin:0 0 1rem;display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;
+    font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--gris);
+    margin:1.5rem 0 .9rem;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;
   }
-  .badge{
-    display:inline-block;padding:.15rem .5rem;border-radius:2px;
-    font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;
-  }
-  .badge.en-ligne{background:var(--sceau-clair);color:var(--sceau)}
-  .badge.en-test{background:var(--ocre-clair);color:var(--ocre)}
-  .badge.a-venir{background:#EFEDE8;color:var(--ardoise)}
+  .sep{color:#B3AC9E}
+  .badge{display:inline-block;padding:.12rem .45rem;font-size:.68rem;letter-spacing:.05em}
+  .badge.en-ligne,.badge.en-test{background:var(--plan-clair);color:var(--plan)}
+  .badge.a-venir{background:var(--creme);color:#7D7669}
 
   .chapeau h1{
     font-family:var(--display);font-weight:600;
-    font-size:clamp(2rem,5vw,3rem);line-height:1.12;
-    letter-spacing:-.02em;margin:0 0 1.25rem;
+    font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.14;
+    letter-spacing:-.02em;margin:0 0 1rem;
   }
-  .chapeau .accroche{
-    font-size:1.1rem;color:var(--ardoise);margin:0 0 2rem;max-width:56ch;
-  }
+  .chapeau .accroche{font-size:1.04rem;color:var(--texte);margin:0 0 1.75rem;max-width:58ch}
 
   .bouton{
-    display:inline-block;
-    background:var(--sceau);color:var(--papier);
-    font-family:var(--corps);font-size:.92rem;font-weight:500;
-    text-decoration:none;padding:.7rem 1.4rem;border-radius:2px;
+    display:inline-block;background:var(--plan);color:var(--papier);
+    font-family:var(--mono);font-size:.8rem;letter-spacing:.03em;
+    text-decoration:none;padding:.65rem 1.3rem;border-radius:0;
     transition:background .15s;
   }
-  .bouton:hover{background:#24493C}
+  .bouton:hover{background:#22406C}
   .bouton:focus-visible{outline:2px solid var(--encre);outline-offset:2px}
 
-  /* ---------- Corps de l'article ---------- */
-  .article{
-    padding:0 0 3rem;
-    border-top:1px solid var(--trait);
-    margin-top:.5rem;
-    padding-top:2.5rem;
-  }
+  .article{border-top:1px solid var(--reglure);padding:2.25rem 0 2.5rem}
   .article h2{
-    font-family:var(--display);font-weight:600;
-    font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;
-    margin:2.75rem 0 .9rem;
+    font-family:var(--display);font-weight:600;font-size:1.42rem;
+    line-height:1.25;letter-spacing:-.01em;margin:2.5rem 0 .85rem;
   }
   .article h2:first-child{margin-top:0}
   .article h3{
-    font-family:var(--corps);font-weight:600;font-size:1.05rem;
-    margin:2rem 0 .6rem;
+    font-family:var(--mono);font-weight:500;font-size:.94rem;
+    letter-spacing:-.01em;margin:2rem 0 .6rem;color:var(--plan);
   }
-  .article p{margin:0 0 1.15rem}
-  .article ul,.article ol{margin:0 0 1.15rem;padding-left:1.3rem}
-  .article li{margin-bottom:.4rem}
-  .article a{color:var(--sceau)}
-  .article strong{font-weight:600}
+  .article p{margin:0 0 1.1rem;color:var(--texte)}
+  .article ul,.article ol{margin:0 0 1.1rem;padding-left:1.3rem;color:var(--texte)}
+  .article li{margin-bottom:.35rem}
+  .article a{color:var(--plan)}
+  .article strong{font-weight:600;color:var(--encre)}
   .article code{
-    font-family:var(--mono);font-size:.88em;
-    background:#F0EEE8;padding:.1rem .35rem;border-radius:2px;
+    font-family:var(--mono);font-size:.86em;
+    background:var(--creme);padding:.1rem .3rem;
   }
-  .article hr{
-    border:none;border-top:1px solid var(--trait);margin:2.5rem 0;
-  }
+  .article hr{border:none;border-top:1px solid var(--reglure);margin:2.25rem 0}
   .article blockquote{
-    margin:1.5rem 0;padding-left:1.1rem;
-    border-left:2px solid var(--sceau);color:var(--ardoise);
+    margin:1.4rem 0;padding-left:1rem;
+    border-left:2px solid var(--plan);color:var(--gris);
   }
-
-  .article figure{margin:2rem 0}
+  .article figure{margin:1.9rem 0}
   .article img{
     width:100%;height:auto;display:block;
-    border:1px solid var(--trait);border-radius:2px;
+    border:1px solid var(--reglure);border-radius:0;background:var(--creme);
   }
   .article figcaption{
-    font-family:var(--mono);font-size:.74rem;color:var(--ardoise);
-    margin-top:.6rem;line-height:1.5;
+    font-family:var(--mono);font-size:.71rem;color:var(--gris);
+    margin-top:.55rem;line-height:1.55;
   }
 
-  /* ---------- Pied ---------- */
-  .pied{
-    border-top:1px solid var(--trait);
-    padding:2.5rem 0 4rem;
-  }
+  .pied{border-top:1px solid var(--reglure);padding:2rem 0 4rem}
   .pied .rappel{
-    font-family:var(--mono);font-size:.74rem;color:var(--ardoise);
-    margin:0 0 1.25rem;
+    font-family:var(--mono);font-size:.72rem;color:var(--gris);margin:0 0 1.1rem;
   }
-
-  .vide{padding:3rem 0;color:var(--ardoise)}
+  .vide{padding:2.5rem 0;color:var(--gris)}
 
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -140,14 +121,14 @@
 <body>
 
 <nav class="retour enveloppe" aria-label="Navigation">
-  <a href="index.html"><span aria-hidden="true">&larr;</span> Tous les outils</a>
+  <a href="index.html"><span aria-hidden="true">&larr;</span> cd ..</a>
 </nav>
 
 <header class="chapeau enveloppe">
   <p class="surtitre" id="surtitre"></p>
   <h1 id="titre">&nbsp;</h1>
   <p class="accroche" id="accroche"></p>
-  <a class="bouton" id="lien-outil" href="#" hidden>Ouvrir l'outil</a>
+  <a class="bouton" id="lien-haut" href="#" hidden>Ouvrir l'outil</a>
 </header>
 
 <main class="article enveloppe" id="article">
@@ -166,55 +147,42 @@ function echapper(s){
   return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
-/* Convertisseur Markdown minimal : titres, images légendées, listes,
-   gras, italique, code, liens, citations, séparateurs, paragraphes. */
-function markdown(src){
+function markdown(src, base){
+  const abs = u => /^(https?:)?\/\//.test(u) ? u : base + u;
   const enligne = t => echapper(t)
-    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,'<img src="$2" alt="$1">')
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,(m,a,u)=>`<img src="${abs(u)}" alt="${a}">`)
     .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,'<a href="$2">$1</a>')
     .replace(/`([^`]+)`/g,'<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
     .replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>');
 
-  const blocs = src.replace(/\r\n/g,"\n").split(/\n{2,}/);
   let html = "";
-
-  for(let bloc of blocs){
+  for(let bloc of src.replace(/\r\n/g,"\n").split(/\n{2,}/)){
     bloc = bloc.trim();
     if(!bloc) continue;
-
     if(/^---+$/.test(bloc)){ html += "<hr>"; continue; }
-
     if(/^###\s+/.test(bloc)){ html += `<h3>${enligne(bloc.replace(/^###\s+/,""))}</h3>`; continue; }
     if(/^##\s+/.test(bloc)){  html += `<h2>${enligne(bloc.replace(/^##\s+/,""))}</h2>`;  continue; }
     if(/^#\s+/.test(bloc)){   html += `<h2>${enligne(bloc.replace(/^#\s+/,""))}</h2>`;   continue; }
 
-    /* Image seule, avec légende optionnelle en italique sur la ligne suivante */
     const lignes = bloc.split("\n");
     const img = lignes[0].match(/^!\[([^\]]*)\]\(([^)\s]+)\)\s*$/);
     if(img){
-      const legende = lignes[1] && /^\*.+\*$/.test(lignes[1].trim())
+      const leg = lignes[1] && /^\*.+\*$/.test(lignes[1].trim())
         ? lignes[1].trim().replace(/^\*|\*$/g,"") : null;
-      html += `<figure><img src="${echapper(img[2])}" alt="${echapper(img[1])}">`
-            + (legende ? `<figcaption>${enligne(legende)}</figcaption>` : "")
-            + `</figure>`;
+      html += `<figure><img src="${echapper(abs(img[2]))}" alt="${echapper(img[1])}">`
+            + (leg ? `<figcaption>${enligne(leg)}</figcaption>` : "") + `</figure>`;
       continue;
     }
-
     if(/^>\s?/.test(bloc)){
-      html += `<blockquote><p>${enligne(bloc.replace(/^>\s?/gm,""))}</p></blockquote>`;
-      continue;
+      html += `<blockquote><p>${enligne(bloc.replace(/^>\s?/gm,""))}</p></blockquote>`; continue;
     }
-
     if(/^[-*+]\s+/.test(bloc)){
-      html += "<ul>" + lignes.map(l=>`<li>${enligne(l.replace(/^[-*+]\s+/,""))}</li>`).join("") + "</ul>";
-      continue;
+      html += "<ul>" + lignes.map(l=>`<li>${enligne(l.replace(/^[-*+]\s+/,""))}</li>`).join("") + "</ul>"; continue;
     }
     if(/^\d+[.)]\s+/.test(bloc)){
-      html += "<ol>" + lignes.map(l=>`<li>${enligne(l.replace(/^\d+[.)]\s+/,""))}</li>`).join("") + "</ol>";
-      continue;
+      html += "<ol>" + lignes.map(l=>`<li>${enligne(l.replace(/^\d+[.)]\s+/,""))}</li>`).join("") + "</ol>"; continue;
     }
-
     html += `<p>${enligne(bloc).replace(/\n/g,"<br>")}</p>`;
   }
   return html;
@@ -225,15 +193,16 @@ function erreur(msg){
   document.getElementById("article").innerHTML = `<p class="vide">${echapper(msg)}</p>`;
 }
 
-const id = new URLSearchParams(location.search).get("id");
+const dossier = new URLSearchParams(location.search).get("outil");
 
-if(!id){
+if(!dossier){
   erreur("Aucun outil demandé. Revenez à la liste des outils.");
 } else {
+  const base = dossier + "/";
   fetch("outils.json?v=" + Date.now())
     .then(r => r.json())
     .then(d => {
-      const o = (d.outils || []).find(x => x.fiche === id);
+      const o = (d.outils || []).find(x => x.dossier === dossier);
       if(!o) throw new Error("inconnu");
 
       document.title = o.titre + " — Boîte à outils";
@@ -242,28 +211,29 @@ if(!id){
 
       const statut = o.statut || "en-ligne";
       document.getElementById("surtitre").innerHTML =
-        (o.categorie ? echapper(o.categorie) : "") +
+        (o.categorie ? echapper(o.categorie) + ' <span class="sep">·</span> ' : "") +
         `<span class="badge ${echapper(statut)}">${echapper(LIBELLES[statut]||statut)}</span>`;
 
-      if(o.url && statut !== "a-venir"){
-        ["lien-outil","lien-bas"].forEach(cle=>{
-          const a = document.getElementById(cle);
-          a.href = o.url; a.hidden = false;
+      if(statut !== "a-venir"){
+        ["lien-haut","lien-bas"].forEach(k=>{
+          const a = document.getElementById(k);
+          a.href = o.url || (base + "index.html");
+          a.hidden = false;
         });
       }
       if(o.usage) document.getElementById("rappel").textContent = o.usage;
 
-      return fetch(`fiches/${encodeURIComponent(id)}.md?v=` + Date.now());
+      return fetch(base + "fiche.md?v=" + Date.now());
     })
     .then(r => { if(!r.ok) throw new Error("md"); return r.text(); })
-    .then(txt => { document.getElementById("article").innerHTML = markdown(txt); })
+    .then(txt => { document.getElementById("article").innerHTML = markdown(txt, base); })
     .catch(e => {
       if(e.message === "inconnu"){
         erreur("Cet outil ne figure pas dans la liste.");
       } else {
         document.getElementById("article").innerHTML =
           `<p class="vide">Le texte de présentation n'a pas pu être chargé.
-           Vérifiez que le fichier <code>fiches/${echapper(id)}.md</code> existe.</p>`;
+           Vérifiez que <code>${echapper(dossier)}/fiche.md</code> existe.</p>`;
       }
     });
 }
