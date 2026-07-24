@@ -75,35 +75,27 @@
     margin:0 0 1.75rem;
   }
 
-  /* ---------- Bloc auteur.cfg ---------- */
-  .config{
-    border:1px solid #E3DED1;
-    background:rgba(250,248,242,.88);
-    border-radius:2px;
-    overflow:hidden;
+  /* ---------- Bloc identité ---------- */
+  .identite{
+    border-top:3px solid var(--plan);
+    padding-top:.9rem;
     max-width:46rem;
     margin:0 0 2rem;
   }
-  .config-titre{
-    background:var(--creme);
-    border-bottom:1px solid #E3DED1;
-    padding:.4rem .8rem;
-    font-family:var(--mono);
-    font-size:.7rem;
-    color:var(--gris-clair);
-    letter-spacing:.06em;
+  .identite-nom{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:1.4rem;
+    line-height:1.12;
+    letter-spacing:-.01em;
+    color:var(--encre);
+    margin:0;
   }
-  .config-corps{
-    padding:.7rem .8rem;
-    font-family:var(--mono);
-    font-size:.76rem;
-    line-height:1.85;
-    color:var(--gris);
-    overflow-wrap:anywhere;
+  .identite-detail{
+    font-size:.94rem;
+    color:var(--texte);
+    margin:.35rem 0 0;
   }
-  .cle{color:var(--plan)}
-  .val{color:var(--encre)}
-  .commentaire{color:#A8A193}
 
   /* ---------- Filtres ---------- */
   .filtres{
@@ -195,9 +187,9 @@
   <h1>boîte-à-outils<span class="curseur" aria-hidden="true">▊</span></h1>
   <p class="intro" id="intro"></p>
 
-  <div class="config">
-    <div class="config-titre">auteur.cfg</div>
-    <div class="config-corps" id="config"></div>
+  <div class="identite">
+    <p class="identite-nom" id="ident-nom"></p>
+    <p class="identite-detail" id="ident-detail"></p>
   </div>
 </header>
 
@@ -241,12 +233,9 @@ function destination(o){
 function rendreEntete(){
   const p = donnees.profil || {};
   if(p.intro) document.getElementById("intro").textContent = p.intro;
-  const l = [];
-  if(p.nom)           l.push(`<span class="cle">nom</span> = <span class="val">"${echapper(p.nom)}"</span>`);
-  if(p.fonction)      l.push(`<span class="cle">fonction</span> = "${echapper(p.fonction)}"`);
-  if(p.etablissement) l.push(`<span class="cle">etablissement</span> = "${echapper(p.etablissement)}"`);
-  if(p.note)          l.push(`<span class="commentaire"># ${echapper(p.note)}</span>`);
-  document.getElementById("config").innerHTML = l.map(x=>`<div>${x}</div>`).join("");
+  if(p.nom) document.getElementById("ident-nom").textContent = p.nom;
+  const detail = [p.fonction, p.etablissement].filter(Boolean).join(" — ");
+  document.getElementById("ident-detail").textContent = detail;
 }
 
 function rendreFiltres(){
