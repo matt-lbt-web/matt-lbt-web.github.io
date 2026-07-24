@@ -18,237 +18,132 @@
     --sceau-clair:#E8F0EC;
     --ocre:#8A6A2F;
     --ocre-clair:#F5EEDF;
-
     --display:'Fraunces',Georgia,serif;
     --corps:'Inter',system-ui,sans-serif;
     --mono:'IBM Plex Mono',monospace;
-
     --marge:clamp(1.25rem,5vw,4rem);
   }
-
   *,*::before,*::after{box-sizing:border-box}
-
   html{-webkit-text-size-adjust:100%}
-
   body{
-    margin:0;
-    background:var(--papier);
-    color:var(--encre);
-    font-family:var(--corps);
-    font-size:16px;
-    line-height:1.6;
+    margin:0;background:var(--papier);color:var(--encre);
+    font-family:var(--corps);font-size:16px;line-height:1.6;
     -webkit-font-smoothing:antialiased;
   }
-
-  .enveloppe{
-    max-width:64rem;
-    margin:0 auto;
-    padding:0 var(--marge);
-  }
+  .enveloppe{max-width:64rem;margin:0 auto;padding:0 var(--marge)}
 
   /* ---------- En-tête ---------- */
-
   .bandeau{
     border-bottom:1px solid var(--trait);
     padding:clamp(3rem,8vw,5.5rem) 0 clamp(2rem,5vw,3rem);
   }
-
   .eyebrow{
-    font-family:var(--mono);
-    font-size:.7rem;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--ardoise);
-    margin:0 0 1.25rem;
+    font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ardoise);margin:0 0 1.25rem;
   }
-
   .bandeau h1{
-    font-family:var(--display);
-    font-weight:600;
-    font-size:clamp(2.4rem,6vw,3.8rem);
-    line-height:1.08;
-    letter-spacing:-.02em;
-    margin:0 0 1.5rem;
-    max-width:16ch;
+    font-family:var(--display);font-weight:600;
+    font-size:clamp(2.4rem,6vw,3.8rem);line-height:1.08;
+    letter-spacing:-.02em;margin:0 0 1.5rem;max-width:16ch;
   }
-
   .bandeau .intro{
-    max-width:52ch;
-    color:var(--ardoise);
-    font-size:1.05rem;
-    margin:0 0 2rem;
+    max-width:52ch;color:var(--ardoise);font-size:1.05rem;margin:0 0 2rem;
   }
-
   .signature{
-    font-family:var(--mono);
-    font-size:.78rem;
-    color:var(--ardoise);
-    border-left:2px solid var(--sceau);
-    padding-left:.9rem;
-    line-height:1.7;
+    font-family:var(--mono);font-size:.78rem;color:var(--ardoise);
+    border-left:2px solid var(--sceau);padding-left:.9rem;line-height:1.7;
   }
-  .signature strong{
-    display:block;
-    color:var(--encre);
-    font-weight:500;
-  }
+  .signature strong{display:block;color:var(--encre);font-weight:500}
 
   /* ---------- Filtres ---------- */
-
   .filtres{
-    display:flex;
-    flex-wrap:wrap;
-    gap:.5rem;
-    padding:1.75rem 0;
-    border-bottom:1px solid var(--trait);
+    display:flex;flex-wrap:wrap;gap:.5rem;
+    padding:1.75rem 0;border-bottom:1px solid var(--trait);
   }
-
   .filtre{
-    font-family:var(--mono);
-    font-size:.75rem;
-    letter-spacing:.04em;
-    color:var(--ardoise);
-    background:none;
-    border:1px solid var(--trait);
-    border-radius:2px;
-    padding:.4rem .8rem;
-    cursor:pointer;
+    font-family:var(--mono);font-size:.75rem;letter-spacing:.04em;
+    color:var(--ardoise);background:none;border:1px solid var(--trait);
+    border-radius:2px;padding:.4rem .8rem;cursor:pointer;
     transition:border-color .15s,color .15s,background .15s;
   }
   .filtre:hover{border-color:var(--ardoise);color:var(--encre)}
   .filtre[aria-pressed="true"]{
-    background:var(--encre);
-    border-color:var(--encre);
-    color:var(--papier);
+    background:var(--encre);border-color:var(--encre);color:var(--papier);
   }
-  .filtre:focus-visible{
-    outline:2px solid var(--sceau);
-    outline-offset:2px;
-  }
+  .filtre:focus-visible{outline:2px solid var(--sceau);outline-offset:2px}
 
   /* ---------- Liste ---------- */
-
-  .liste{
-    list-style:none;
-    margin:0;
-    padding:0;
-  }
-
-  .outil{
-    border-bottom:1px solid var(--trait);
-  }
+  .liste{list-style:none;margin:0;padding:0}
+  .outil{border-bottom:1px solid var(--trait)}
 
   .outil a.bloc{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:.75rem;
-    padding:2.25rem 0;
-    text-decoration:none;
-    color:inherit;
+    display:grid;grid-template-columns:1fr;gap:1rem;
+    padding:2.25rem 0;text-decoration:none;color:inherit;
     transition:background .18s;
   }
   .outil a.bloc:hover{
     background:linear-gradient(90deg,rgba(46,94,78,.045),transparent 70%);
   }
-  .outil a.bloc:focus-visible{
-    outline:2px solid var(--sceau);
-    outline-offset:-2px;
-  }
+  .outil a.bloc:focus-visible{outline:2px solid var(--sceau);outline-offset:-2px}
 
-  @media(min-width:46rem){
+  @media(min-width:52rem){
     .outil a.bloc{
-      grid-template-columns:11rem 1fr;
-      gap:2.5rem;
-      align-items:start;
+      grid-template-columns:15rem 1fr;
+      gap:2.25rem;align-items:start;
     }
   }
 
-  .meta{
-    font-family:var(--mono);
-    font-size:.72rem;
-    letter-spacing:.06em;
-    color:var(--ardoise);
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:.6rem;
+  .vignette{
+    width:100%;aspect-ratio:16/10;object-fit:cover;
+    border:1px solid var(--trait);border-radius:2px;
+    background:#F0EEE8;display:block;
   }
-  @media(min-width:46rem){
-    .meta{
-      display:block;
-      padding-top:.45rem;
-    }
-    .meta .categorie{display:block;margin-bottom:.55rem}
+  .sans-vignette{
+    width:100%;aspect-ratio:16/10;border:1px solid var(--trait);
+    border-radius:2px;background:#F0EEE8;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:.7rem;color:var(--ardoise);
+    letter-spacing:.08em;text-transform:uppercase;
   }
 
+  .contenu .meta{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;
+    color:var(--ardoise);display:flex;flex-wrap:wrap;align-items:center;
+    gap:.65rem;margin-bottom:.65rem;
+  }
   .badge{
-    display:inline-block;
-    padding:.15rem .5rem;
-    border-radius:2px;
-    font-size:.68rem;
-    letter-spacing:.06em;
-    text-transform:uppercase;
+    display:inline-block;padding:.15rem .5rem;border-radius:2px;
+    font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;
   }
   .badge.en-ligne{background:var(--sceau-clair);color:var(--sceau)}
   .badge.en-test{background:var(--ocre-clair);color:var(--ocre)}
   .badge.a-venir{background:#EFEDE8;color:var(--ardoise)}
 
   .contenu h2{
-    font-family:var(--display);
-    font-weight:600;
-    font-size:1.4rem;
-    line-height:1.25;
-    letter-spacing:-.01em;
-    margin:0 0 .5rem;
-    display:flex;
-    align-items:baseline;
-    gap:.55rem;
+    font-family:var(--display);font-weight:600;font-size:1.4rem;
+    line-height:1.25;letter-spacing:-.01em;margin:0 0 .5rem;
+    display:flex;align-items:baseline;gap:.55rem;
   }
-
   .fleche{
-    font-size:.95rem;
-    color:var(--sceau);
-    transition:transform .18s;
-    flex-shrink:0;
+    font-size:.95rem;color:var(--sceau);
+    transition:transform .18s;flex-shrink:0;
   }
   .outil a.bloc:hover .fleche{transform:translateX(4px)}
 
-  .contenu p{
-    margin:0 0 .65rem;
-    max-width:62ch;
-    color:#3E4C54;
-  }
-
+  .contenu p{margin:0 0 .65rem;max-width:62ch;color:#3E4C54}
   .contenu .usage{
-    font-size:.88rem;
-    color:var(--ardoise);
-    font-style:italic;
-    margin:0;
+    font-size:.88rem;color:var(--ardoise);font-style:italic;margin:0;
   }
 
   /* ---------- Pied ---------- */
-
   .pied{
-    padding:3rem 0 4rem;
-    font-family:var(--mono);
-    font-size:.74rem;
-    color:var(--ardoise);
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:space-between;
-    gap:1rem;
+    padding:3rem 0 4rem;font-family:var(--mono);font-size:.74rem;
+    color:var(--ardoise);display:flex;flex-wrap:wrap;
+    justify-content:space-between;gap:1rem;
   }
-  .pied a{color:var(--ardoise)}
+  .vide{padding:3rem 0;color:var(--ardoise);font-size:.95rem}
 
-  .vide{
-    padding:3rem 0;
-    color:var(--ardoise);
-    font-size:.95rem;
-  }
-
-  @media(prefers-reduced-motion:reduce){
-    *{transition:none!important;animation:none!important}
-  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -256,7 +151,7 @@
 <header class="bandeau">
   <div class="enveloppe">
     <p class="eyebrow">Outils en ligne</p>
-    <h1 id="titre-page">Boîte à outils</h1>
+    <h1>Boîte à outils</h1>
     <p class="intro" id="intro"></p>
     <div class="signature" id="signature"></div>
   </div>
@@ -277,18 +172,13 @@
 </footer>
 
 <script>
-const LIBELLES = {
-  "en-ligne": "En ligne",
-  "en-test":  "En test",
-  "a-venir":  "À venir"
-};
+const LIBELLES = {"en-ligne":"En ligne","en-test":"En test","a-venir":"À venir"};
 
 let donnees = null;
 let filtreActif = "tous";
 
 function echapper(s){
-  return String(s).replace(/[&<>"']/g, c =>
-    ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
 function formaterDate(iso){
@@ -299,48 +189,53 @@ function formaterDate(iso){
   return m ? `${mois[parseInt(m,10)-1]} ${a}` : a;
 }
 
+function destination(o){
+  if(o.fiche) return `fiche.html?id=${encodeURIComponent(o.fiche)}`;
+  return o.url || "#";
+}
+
 function rendreEntete(){
   const p = donnees.profil || {};
   if(p.intro) document.getElementById("intro").textContent = p.intro;
-  const sig = document.getElementById("signature");
-  sig.innerHTML =
+  document.getElementById("signature").innerHTML =
     (p.nom ? `<strong>${echapper(p.nom)}</strong>` : "") +
     [p.fonction, p.etablissement].filter(Boolean).map(echapper).join("<br>");
 }
 
 function rendreFiltres(){
-  const cats = [...new Set(donnees.outils.map(o => o.categorie).filter(Boolean))].sort();
+  const cats = [...new Set(donnees.outils.map(o=>o.categorie).filter(Boolean))].sort();
   const box = document.getElementById("filtres");
   box.innerHTML = "";
-  [["tous","Tous"], ...cats.map(c => [c,c])].forEach(([val,lib]) => {
+  [["tous","Tous"], ...cats.map(c=>[c,c])].forEach(([val,lib])=>{
     const b = document.createElement("button");
-    b.className = "filtre";
-    b.type = "button";
-    b.textContent = lib;
+    b.className = "filtre"; b.type = "button"; b.textContent = lib;
     b.setAttribute("aria-pressed", String(val === filtreActif));
-    b.addEventListener("click", () => { filtreActif = val; rendreFiltres(); rendreListe(); });
+    b.addEventListener("click", ()=>{ filtreActif = val; rendreFiltres(); rendreListe(); });
     box.appendChild(b);
   });
 }
 
 function rendreListe(){
-  const liste = document.getElementById("liste");
   const visibles = donnees.outils
     .filter(o => filtreActif === "tous" || o.categorie === filtreActif)
-    .sort((a,b) => (b.date || "").localeCompare(a.date || ""));
+    .sort((a,b) => (b.date||"").localeCompare(a.date||""));
 
-  liste.innerHTML = visibles.map(o => {
+  document.getElementById("liste").innerHTML = visibles.map(o=>{
     const statut = o.statut || "en-ligne";
+    const visuel = o.vignette
+      ? `<img class="vignette" src="${echapper(o.vignette)}" alt="" loading="lazy">`
+      : `<div class="sans-vignette" aria-hidden="true">${echapper(o.categorie||"Outil")}</div>`;
     return `
     <li class="outil">
-      <a class="bloc" href="${echapper(o.url)}">
-        <div class="meta">
-          <span class="categorie">${echapper(o.categorie || "")}</span>
-          <span class="badge ${echapper(statut)}">${echapper(LIBELLES[statut] || statut)}</span>
-        </div>
+      <a class="bloc" href="${echapper(destination(o))}">
+        ${visuel}
         <div class="contenu">
+          <p class="meta">
+            <span>${echapper(o.categorie||"")}</span>
+            <span class="badge ${echapper(statut)}">${echapper(LIBELLES[statut]||statut)}</span>
+          </p>
           <h2>${echapper(o.titre)} <span class="fleche" aria-hidden="true">&rarr;</span></h2>
-          <p>${echapper(o.description || "")}</p>
+          <p>${echapper(o.description||"")}</p>
           ${o.usage ? `<p class="usage">${echapper(o.usage)}</p>` : ""}
         </div>
       </a>
@@ -352,10 +247,8 @@ function rendreListe(){
   const n = donnees.outils.length;
   document.getElementById("compteur").textContent =
     n + (n > 1 ? " outils publiés" : " outil publié");
-
-  const recente = donnees.outils
-    .map(o => o.date).filter(Boolean).sort().pop();
-  document.getElementById("maj").textContent = formaterDate(recente);
+  document.getElementById("maj").textContent =
+    formaterDate(donnees.outils.map(o=>o.date).filter(Boolean).sort().pop());
 }
 
 fetch("outils.json?v=" + Date.now())
@@ -364,8 +257,8 @@ fetch("outils.json?v=" + Date.now())
   .catch(() => {
     document.getElementById("liste").innerHTML =
       `<li class="vide">La liste des outils n'a pas pu être chargée.
-       Vérifiez que le fichier <code>outils.json</code> est présent
-       à côté de <code>index.html</code>.</li>`;
+       Vérifiez que <code>outils.json</code> est présent à côté de
+       <code>index.html</code> et que sa syntaxe est valide.</li>`;
   });
 </script>
 </body>
