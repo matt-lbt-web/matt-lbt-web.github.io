@@ -12,7 +12,7 @@
       "titre": "Générateur de calendrier de classe",
       "description": "Construit le calendrier prévisionnel annuel d'une classe en quelques minutes : congés et jours fériés placés automatiquement selon la zone, puis saisie des temps forts de la filière. Le calendrier s'exporte en PDF prêt à imprimer, et se recharge tel quel pour ne corriger que ce qui change.",
       "usage": "Professeurs principaux et coordonnateurs, en amont de la synthèse présentée au conseil d'administration.",
-      "vignette": "../images/images/calendrier-classe-2.png",
+      "vignette": "images/calendrier-classe-2.png",
       "categorie": "Organisation",
       "statut": "en-test",
       "date": "2026-07"
