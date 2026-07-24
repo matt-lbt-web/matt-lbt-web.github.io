@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche outil — Boîte à outils</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --encre:#1B2A33;
+    --papier:#FBFAF7;
+    --ardoise:#5C6B73;
+    --trait:#DDD8CE;
+    --sceau:#2E5E4E;
+    --sceau-clair:#E8F0EC;
+    --ocre:#8A6A2F;
+    --ocre-clair:#F5EEDF;
+    --display:'Fraunces',Georgia,serif;
+    --corps:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+    --marge:clamp(1.25rem,5vw,4rem);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--papier);color:var(--encre);
+    font-family:var(--corps);font-size:16px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .enveloppe{max-width:46rem;margin:0 auto;padding:0 var(--marge)}
+
+  /* ---------- Fil d'ariane ---------- */
+  .retour{
+    padding:1.75rem 0;
+    border-bottom:1px solid var(--trait);
+  }
+  .retour a{
+    font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;
+    color:var(--ardoise);text-decoration:none;
+    display:inline-flex;align-items:center;gap:.45rem;
+  }
+  .retour a:hover{color:var(--encre)}
+  .retour a:focus-visible{outline:2px solid var(--sceau);outline-offset:3px}
+
+  /* ---------- En-tête de fiche ---------- */
+  .chapeau{padding:clamp(2.5rem,6vw,4rem) 0 2rem}
+  .surtitre{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ardoise);
+    margin:0 0 1rem;display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;
+  }
+  .badge{
+    display:inline-block;padding:.15rem .5rem;border-radius:2px;
+    font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;
+  }
+  .badge.en-ligne{background:var(--sceau-clair);color:var(--sceau)}
+  .badge.en-test{background:var(--ocre-clair);color:var(--ocre)}
+  .badge.a-venir{background:#EFEDE8;color:var(--ardoise)}
+
+  .chapeau h1{
+    font-family:var(--display);font-weight:600;
+    font-size:clamp(2rem,5vw,3rem);line-height:1.12;
+    letter-spacing:-.02em;margin:0 0 1.25rem;
+  }
+  .chapeau .accroche{
+    font-size:1.1rem;color:var(--ardoise);margin:0 0 2rem;max-width:56ch;
+  }
+
+  .bouton{
+    display:inline-block;
+    background:var(--sceau);color:var(--papier);
+    font-family:var(--corps);font-size:.92rem;font-weight:500;
+    text-decoration:none;padding:.7rem 1.4rem;border-radius:2px;
+    transition:background .15s;
+  }
+  .bouton:hover{background:#24493C}
+  .bouton:focus-visible{outline:2px solid var(--encre);outline-offset:2px}
+
+  /* ---------- Corps de l'article ---------- */
+  .article{
+    padding:0 0 3rem;
+    border-top:1px solid var(--trait);
+    margin-top:.5rem;
+    padding-top:2.5rem;
+  }
+  .article h2{
+    font-family:var(--display);font-weight:600;
+    font-size:1.5rem;line-height:1.25;letter-spacing:-.01em;
+    margin:2.75rem 0 .9rem;
+  }
+  .article h2:first-child{margin-top:0}
+  .article h3{
+    font-family:var(--corps);font-weight:600;font-size:1.05rem;
+    margin:2rem 0 .6rem;
+  }
+  .article p{margin:0 0 1.15rem}
+  .article ul,.article ol{margin:0 0 1.15rem;padding-left:1.3rem}
+  .article li{margin-bottom:.4rem}
+  .article a{color:var(--sceau)}
+  .article strong{font-weight:600}
+  .article code{
+    font-family:var(--mono);font-size:.88em;
+    background:#F0EEE8;padding:.1rem .35rem;border-radius:2px;
+  }
+  .article hr{
+    border:none;border-top:1px solid var(--trait);margin:2.5rem 0;
+  }
+  .article blockquote{
+    margin:1.5rem 0;padding-left:1.1rem;
+    border-left:2px solid var(--sceau);color:var(--ardoise);
+  }
+
+  .article figure{margin:2rem 0}
+  .article img{
+    width:100%;height:auto;display:block;
+    border:1px solid var(--trait);border-radius:2px;
+  }
+  .article figcaption{
+    font-family:var(--mono);font-size:.74rem;color:var(--ardoise);
+    margin-top:.6rem;line-height:1.5;
+  }
+
+  /* ---------- Pied ---------- */
+  .pied{
+    border-top:1px solid var(--trait);
+    padding:2.5rem 0 4rem;
+  }
+  .pied .rappel{
+    font-family:var(--mono);font-size:.74rem;color:var(--ardoise);
+    margin:0 0 1.25rem;
+  }
+
+  .vide{padding:3rem 0;color:var(--ardoise)}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav class="retour enveloppe" aria-label="Navigation">
+  <a href="index.html"><span aria-hidden="true">&larr;</span> Tous les outils</a>
+</nav>
+
+<header class="chapeau enveloppe">
+  <p class="surtitre" id="surtitre"></p>
+  <h1 id="titre">&nbsp;</h1>
+  <p class="accroche" id="accroche"></p>
+  <a class="bouton" id="lien-outil" href="#" hidden>Ouvrir l'outil</a>
+</header>
+
+<main class="article enveloppe" id="article">
+  <p class="vide">Chargement…</p>
+</main>
+
+<footer class="pied enveloppe">
+  <p class="rappel" id="rappel"></p>
+  <a class="bouton" id="lien-bas" href="#" hidden>Ouvrir l'outil</a>
+</footer>
+
+<script>
+const LIBELLES = {"en-ligne":"En ligne","en-test":"En test","a-venir":"À venir"};
+
+function echapper(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* Convertisseur Markdown minimal : titres, images légendées, listes,
+   gras, italique, code, liens, citations, séparateurs, paragraphes. */
+function markdown(src){
+  const enligne = t => echapper(t)
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,'<img src="$2" alt="$1">')
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,'<a href="$2">$1</a>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>');
+
+  const blocs = src.replace(/\r\n/g,"\n").split(/\n{2,}/);
+  let html = "";
+
+  for(let bloc of blocs){
+    bloc = bloc.trim();
+    if(!bloc) continue;
+
+    if(/^---+$/.test(bloc)){ html += "<hr>"; continue; }
+
+    if(/^###\s+/.test(bloc)){ html += `<h3>${enligne(bloc.replace(/^###\s+/,""))}</h3>`; continue; }
+    if(/^##\s+/.test(bloc)){  html += `<h2>${enligne(bloc.replace(/^##\s+/,""))}</h2>`;  continue; }
+    if(/^#\s+/.test(bloc)){   html += `<h2>${enligne(bloc.replace(/^#\s+/,""))}</h2>`;   continue; }
+
+    /* Image seule, avec légende optionnelle en italique sur la ligne suivante */
+    const lignes = bloc.split("\n");
+    const img = lignes[0].match(/^!\[([^\]]*)\]\(([^)\s]+)\)\s*$/);
+    if(img){
+      const legende = lignes[1] && /^\*.+\*$/.test(lignes[1].trim())
+        ? lignes[1].trim().replace(/^\*|\*$/g,"") : null;
+      html += `<figure><img src="${echapper(img[2])}" alt="${echapper(img[1])}">`
+            + (legende ? `<figcaption>${enligne(legende)}</figcaption>` : "")
+            + `</figure>`;
+      continue;
+    }
+
+    if(/^>\s?/.test(bloc)){
+      html += `<blockquote><p>${enligne(bloc.replace(/^>\s?/gm,""))}</p></blockquote>`;
+      continue;
+    }
+
+    if(/^[-*+]\s+/.test(bloc)){
+      html += "<ul>" + lignes.map(l=>`<li>${enligne(l.replace(/^[-*+]\s+/,""))}</li>`).join("") + "</ul>";
+      continue;
+    }
+    if(/^\d+[.)]\s+/.test(bloc)){
+      html += "<ol>" + lignes.map(l=>`<li>${enligne(l.replace(/^\d+[.)]\s+/,""))}</li>`).join("") + "</ol>";
+      continue;
+    }
+
+    html += `<p>${enligne(bloc).replace(/\n/g,"<br>")}</p>`;
+  }
+  return html;
+}
+
+function erreur(msg){
+  document.getElementById("titre").textContent = "Fiche introuvable";
+  document.getElementById("article").innerHTML = `<p class="vide">${echapper(msg)}</p>`;
+}
+
+const id = new URLSearchParams(location.search).get("id");
+
+if(!id){
+  erreur("Aucun outil demandé. Revenez à la liste des outils.");
+} else {
+  fetch("outils.json?v=" + Date.now())
+    .then(r => r.json())
+    .then(d => {
+      const o = (d.outils || []).find(x => x.fiche === id);
+      if(!o) throw new Error("inconnu");
+
+      document.title = o.titre + " — Boîte à outils";
+      document.getElementById("titre").textContent = o.titre;
+      document.getElementById("accroche").textContent = o.description || "";
+
+      const statut = o.statut || "en-ligne";
+      document.getElementById("surtitre").innerHTML =
+        (o.categorie ? echapper(o.categorie) : "") +
+        `<span class="badge ${echapper(statut)}">${echapper(LIBELLES[statut]||statut)}</span>`;
+
+      if(o.url && statut !== "a-venir"){
+        ["lien-outil","lien-bas"].forEach(cle=>{
+          const a = document.getElementById(cle);
+          a.href = o.url; a.hidden = false;
+        });
+      }
+      if(o.usage) document.getElementById("rappel").textContent = o.usage;
+
+      return fetch(`fiches/${encodeURIComponent(id)}.md?v=` + Date.now());
+    })
+    .then(r => { if(!r.ok) throw new Error("md"); return r.text(); })
+    .then(txt => { document.getElementById("article").innerHTML = markdown(txt); })
+    .catch(e => {
+      if(e.message === "inconnu"){
+        erreur("Cet outil ne figure pas dans la liste.");
+      } else {
+        document.getElementById("article").innerHTML =
+          `<p class="vide">Le texte de présentation n'a pas pu être chargé.
+           Vérifiez que le fichier <code>fiches/${echapper(id)}.md</code> existe.</p>`;
+      }
+    });
+}
+</script>
+</body>
+</html>

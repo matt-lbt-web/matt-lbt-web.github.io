@@ -8,9 +8,11 @@
   "outils": [
     {
       "titre": "Générateur de calendrier de classe",
-      "description": "Construit le calendrier prévisionnel annuel d'une classe en quelques minutes : congés et jours fériés placés automatiquement selon la zone, puis saisie des temps forts de la filière — stages, immersions sur l'exploitation, CCF, examens, voyages. L'aperçu se met à jour à chaque saisie et s'exporte en PDF prêt à imprimer, ou en CSV rechargeable pour ne corriger que ce qui a changé. Fonctionne dans le navigateur, sans installation ni collecte de données.",
+      "description": "Construit le calendrier prévisionnel annuel d'une classe en quelques minutes : congés et jours fériés placés automatiquement, puis saisie des temps forts de la filière. Export PDF prêt à imprimer et CSV rechargeable.",
       "usage": "Destiné aux professeurs principaux et coordonnateurs, en amont de la synthèse présentée au conseil d'administration.",
       "url": "https://matt-lbt-web.github.io/calendrier-classe/",
+      "fiche": "calendrier-classe",
+      "vignette": "images/calendrier-classe-1.png",
       "categorie": "Organisation",
       "statut": "en-test",
       "date": "2026-07"
