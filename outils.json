@@ -1,9 +1,8 @@
 {
   "profil": {
     "nom": "Matthias Lombart",
-    "fonction": "Directeur adjoint",
+    "fonction": "Directeur adjoint . Proviseur adjoint",
     "etablissement": "Campus Marmilhat · EPLEFPA de Clermont-Ferrand",
-    "note": "outils autonomes, sans installation ni collecte de données",
     "intro": "Des outils construits pour répondre à des besoins concrets de pilotage et de gestion en établissement. Chacun s'ouvre dans le navigateur, sans installation."
   },
   "outils": [
@@ -27,11 +26,11 @@
       "date": "2026-05"
     },
     {
-      "dossier": "dossier-financement",
-      "titre": "Guide de la demande de financement",
-      "description": "Parcours guidé de constitution d'un dossier de financement : pièces attendues, ordre de présentation, points de vigilance à chaque étape.",
-      "usage": "Accompagnement des porteurs de projet avant un rendez-vous bancaire.",
-      "categorie": "Gestion financière",
+      "dossier": "Pilotage de la DGH (guepard)",
+      "titre": "Outil de pilotage de la DGH à partir des extractions guepard",
+      "description": "decriptif de l'outil",
+      "usage": "Permet l'animation des réunions de chaires et de filières.",
+      "categorie": "Pilotage des moyens",
       "statut": "a-venir",
       "date": "2026-01"
     }
