@@ -1,320 +1,491 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boîte à outils — Matthias Lombart</title>
-<meta name="description" content="Outils en ligne pour le pilotage et la gestion en établissement.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier de classe — PP / Coordo</title>
 <style>
-  :root{
-    --papier:#FAF8F2;
-    --carreau:#F4F1E9;
-    --reglure:#E9E5DA;
-    --encre:#201E19;
-    --texte:#4F4A41;
-    --gris:#6E6759;
-    --gris-clair:#8A8377;
-    --gouttiere:#B3AC9E;
-    --plan:#2B4C7E;
-    --plan-clair:#E4EAF3;
-    --creme:#F2EFE6;
-
-    --display:'Fraunces',Georgia,serif;
-    --corps:'Inter',system-ui,sans-serif;
-    --mono:'JetBrains Mono','IBM Plex Mono',monospace;
-
-    --marge:clamp(1.25rem,5vw,4rem);
-  }
-
-  *,*::before,*::after{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
-
-  body{
-    margin:0;
-    color:var(--encre);
-    font-family:var(--corps);
-    font-size:16px;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-    background-color:var(--papier);
-    background-image:
-      linear-gradient(var(--carreau) 1px,transparent 1px),
-      linear-gradient(90deg,var(--carreau) 1px,transparent 1px),
-      linear-gradient(var(--reglure) 1px,transparent 1px),
-      linear-gradient(90deg,var(--reglure) 1px,transparent 1px);
-    background-size:12px 12px,12px 12px,60px 60px,60px 60px;
-    background-position:0 0;
-  }
-
-  .enveloppe{max-width:64rem;margin:0 auto;padding:0 var(--marge)}
-
-  /* ---------- En-tête ---------- */
-  .bandeau{padding:clamp(2.5rem,7vw,4.5rem) 0 clamp(1.5rem,4vw,2.5rem)}
-
-  .bandeau h1{
-    font-family:var(--mono);
-    font-weight:500;
-    font-size:clamp(1.9rem,5.5vw,2.9rem);
-    line-height:1.15;
-    letter-spacing:-.03em;
-    margin:0 0 .75rem;
-  }
-  .curseur{
-    color:var(--plan);
-    animation:clignote 1.15s step-end infinite;
-  }
-  @keyframes clignote{50%{opacity:0}}
-
-  .bandeau .intro{
-    max-width:50ch;
-    color:var(--texte);
-    font-size:1.02rem;
-    margin:0 0 1.75rem;
-  }
-
-  /* ---------- Bloc auteur.cfg ---------- */
-  .config{
-    border:1px solid #E3DED1;
-    background:rgba(250,248,242,.88);
-    border-radius:2px;
-    overflow:hidden;
-    max-width:46rem;
-    margin:0 0 2rem;
-  }
-  .config-titre{
-    background:var(--creme);
-    border-bottom:1px solid #E3DED1;
-    padding:.4rem .8rem;
-    font-family:var(--mono);
-    font-size:.7rem;
-    color:var(--gris-clair);
-    letter-spacing:.06em;
-  }
-  .config-corps{
-    padding:.7rem .8rem;
-    font-family:var(--mono);
-    font-size:.76rem;
-    line-height:1.85;
-    color:var(--gris);
-    overflow-wrap:anywhere;
-  }
-  .cle{color:var(--plan)}
-  .val{color:var(--encre)}
-  .commentaire{color:#A8A193}
-
-  /* ---------- Filtres ---------- */
-  .filtres{
-    display:flex;flex-wrap:wrap;gap:.4rem;
-    padding-bottom:1.1rem;
-    border-bottom:1px solid var(--reglure);
-  }
-  .filtre{
-    font-family:var(--mono);font-size:.73rem;letter-spacing:.03em;
-    color:var(--gris);background:rgba(250,248,242,.8);
-    border:1px solid var(--reglure);border-radius:0;
-    padding:.35rem .75rem;cursor:pointer;
-    transition:border-color .15s,color .15s,background .15s;
-  }
-  .filtre:hover{border-color:var(--gris-clair);color:var(--encre)}
-  .filtre[aria-pressed="true"]{
-    background:var(--encre);border-color:var(--encre);color:var(--papier);
-  }
-  .filtre:focus-visible{outline:2px solid var(--plan);outline-offset:2px}
-
-  /* ---------- Liste ---------- */
-  .liste{list-style:none;margin:0;padding:0}
-  .outil{border-bottom:1px solid var(--reglure)}
-
-  .outil a.bloc{
-    display:grid;grid-template-columns:1fr;gap:1rem;
-    padding:1.75rem 0;text-decoration:none;color:inherit;
-    transition:background .18s;
-  }
-  .outil a.bloc:hover{
-    background:linear-gradient(90deg,rgba(43,76,126,.05),transparent 72%);
-  }
-  .outil a.bloc:focus-visible{outline:2px solid var(--plan);outline-offset:-2px}
-
-  @media(min-width:52rem){
-    .outil a.bloc{grid-template-columns:14rem 1fr;gap:2rem;align-items:start}
-  }
-
-  .vignette,.sans-vignette{
-    width:100%;aspect-ratio:16/10;
-    border:1px solid var(--reglure);border-radius:0;
-    background:var(--creme);display:block;
-  }
-  .vignette{object-fit:cover;object-position:top left}
-  .sans-vignette{
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--mono);font-size:.68rem;color:#9C9587;
-    letter-spacing:.08em;
-  }
-
-  .contenu .meta{
-    font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
-    color:var(--gris);display:flex;flex-wrap:wrap;align-items:center;
-    gap:.5rem;margin:0 0 .5rem;text-transform:uppercase;
-  }
-  .sep{color:var(--gouttiere)}
-  .badge{display:inline-block;padding:.12rem .45rem;font-size:.68rem;letter-spacing:.05em}
-  .badge.en-ligne{background:var(--plan-clair);color:var(--plan)}
-  .badge.en-test{background:var(--plan-clair);color:var(--plan)}
-  .badge.a-venir{background:var(--creme);color:#7D7669}
-
-  .contenu h2{
-    font-family:var(--display);font-weight:600;font-size:1.32rem;
-    line-height:1.25;letter-spacing:-.01em;margin:0 0 .4rem;
-    display:flex;align-items:baseline;gap:.5rem;
-  }
-  .fleche{font-size:.9rem;color:var(--plan);transition:transform .18s;flex-shrink:0}
-  .outil a.bloc:hover .fleche{transform:translateX(4px)}
-
-  .contenu p{margin:0 0 .5rem;max-width:64ch;color:var(--texte);font-size:.94rem}
-  .contenu .usage{font-size:.86rem;color:#7D7669;font-style:italic;margin:0}
-
-  /* ---------- Pied ---------- */
-  .pied{
-    padding:2.5rem 0 4rem;font-family:var(--mono);font-size:.72rem;
-    color:var(--gris);display:flex;flex-wrap:wrap;
-    justify-content:space-between;gap:1rem;
-  }
-  .vide{padding:2.5rem 0;color:var(--gris);font-size:.94rem}
-
-  @media(prefers-reduced-motion:reduce){
-    *{transition:none!important;animation:none!important}
+  :root{ --bleu:#2E5FA3; --orange:#E8763A; --bord:#cfd6e0; --gris:#f5f7fa; }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Arial,sans-serif;margin:0;background:#eef1f5;color:#1f2a3a;font-size:14px}
+  header.app{background:var(--bleu);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  header.app h1{font-size:18px;margin:0;font-weight:600}
+  header.app .sub{font-size:12px;opacity:.85}
+  .wrap{max-width:1500px;margin:0 auto;padding:18px}
+  .panel{background:#fff;border:1px solid var(--bord);border-radius:10px;padding:16px 18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .panel h2{font-size:15px;margin:0 0 12px;color:var(--bleu);border-bottom:2px solid var(--gris);padding-bottom:6px}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:12px;font-weight:600;color:#56627a}
+  input,select{padding:8px 10px;border:1px solid var(--bord);border-radius:7px;font-size:14px;font-family:inherit;background:#fff}
+  input:focus,select:focus{outline:none;border-color:var(--bleu)}
+  button{cursor:pointer;border:none;border-radius:7px;padding:9px 16px;font-size:14px;font-weight:600;font-family:inherit}
+  .btn-primary{background:var(--bleu);color:#fff}.btn-primary:hover{background:#244a82}
+  .btn-orange{background:var(--orange);color:#fff}.btn-orange:hover{background:#cf5f26}
+  .btn-green{background:#2e9e5b;color:#fff}.btn-green:hover{background:#26824b}
+  .btn-ghost{background:#eef1f5;color:#33415c}.btn-ghost:hover{background:#dfe5ee}
+  .btn-danger{background:#fff;color:#c0392b;border:1px solid #e6b9b3;padding:4px 9px;font-size:12px}.btn-danger:hover{background:#fdecea}
+  .hint{font-size:12px;color:#7a8499;margin:6px 0 0}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  table.evlist{width:100%;border-collapse:collapse;margin-top:6px}
+  table.evlist th,table.evlist td{text-align:left;padding:7px 8px;border-bottom:1px solid #eef1f5;font-size:13px}
+  table.evlist th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#8893a7}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.15);vertical-align:middle;margin-right:6px}
+  .tag{font-size:10px;background:#eef3fb;color:#3a6bb0;border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:700}
+  .notice{background:#fff8ec;border:1px solid #f3d9a6;border-radius:8px;padding:10px 14px;font-size:13px;color:#7a5a14;margin-bottom:16px}
+  #cal-export{background:#fff;padding:10px}
+  .cal-title{display:flex;align-items:stretch}
+  .cal-title .zone{background:#fff;border:3px solid var(--bleu);color:var(--bleu);font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 18px;font-size:16px;letter-spacing:.05em}
+  .cal-title .name{flex:1;background:var(--bleu);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .cal-title .corner{width:46px;background:var(--orange)}
+  table.cal{border-collapse:collapse;width:100%;table-layout:fixed}
+  table.cal th{background:var(--orange);color:#fff;font-size:12px;font-weight:700;border:1px solid #fff;padding:4px 2px}
+  table.cal td{border:1px solid #e2e2e2;height:18px;font-size:10px;padding:0 3px;white-space:nowrap;overflow:hidden}
+  table.cal td .num{font-weight:600;margin-right:3px}
+  table.cal td .dow{opacity:.6}
+  table.cal td.we{background:#ececec}
+  table.cal td.empty{background:#fafafa;border-color:#f0f0f0}
+  table.cal td .lbl{font-weight:700;font-size:9px}
+  .legend{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .legend h3{font-size:12px;margin:0 0 6px;color:#333;border-bottom:1px solid #ddd;padding-bottom:3px}
+  .legend .item{display:flex;align-items:center;gap:7px;font-size:11px;margin:3px 0}
+  .legend .item .swatch{width:16px;height:13px}
+  .footnote{font-size:10px;color:#666;margin-top:8px;font-style:italic}
+  /* force l'impression des couleurs de fond (sinon le PDF sort en noir et blanc) */
+  #cal-export, #cal-export *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @media print{
+    @page{size:A4 landscape;margin:6mm}
+    html,body{background:#fff}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+    body *{visibility:hidden}
+    #cal-export,#cal-export *{visibility:visible}
+    #cal-export{position:absolute;left:0;top:0;width:100%;padding:0}
+    table.cal td{height:auto}
   }
 </style>
 </head>
 <body>
-
-<header class="bandeau enveloppe">
-  <h1>boîte-à-outils<span class="curseur" aria-hidden="true">▊</span></h1>
-  <p class="intro" id="intro"></p>
-
-  <div class="config">
-    <div class="config-titre">auteur.cfg</div>
-    <div class="config-corps" id="config"></div>
+<header class="app">
+  <div>
+    <h1>Calendrier de classe — PP / Coordo</h1>
+    <div class="sub">Saisissez vos événements, générez le PDF, rechargez le CSV plus tard pour ne corriger que ce qui change.</div>
+  </div>
+  <div class="toolbar">
+    <button class="btn-ghost" onclick="document.getElementById('pdfin').click()">Recharger un PDF</button>
+    <input type="file" id="pdfin" accept="application/pdf" style="display:none" onchange="importPDF(this.files[0])">
+    <button class="btn-orange" onclick="genPDF()">Générer le calendrier en PDF</button>
   </div>
 </header>
 
-<nav class="enveloppe" aria-label="Filtrer par domaine">
-  <div class="filtres" id="filtres"></div>
-</nav>
+<div class="wrap">
 
-<main class="enveloppe">
-  <ul class="liste" id="liste"></ul>
-  <p class="vide" id="vide" hidden>Aucun outil dans ce domaine pour le moment.</p>
-</main>
+  <div class="notice">
+    <b>Mode d'emploi :</b> 1) réglez l'année, la classe et la zone, puis cliquez sur <b>Ajouter vacances + jours fériés</b> — 2) ajoutez vos événements (stages, CCF, examens…) — 3) cliquez sur <b>Générer le PDF</b> puis, dans la fenêtre d'impression, choisissez <b>Enregistrer au format PDF</b>.
+    <br>Pour modifier plus tard : cliquez sur <b>Recharger un PDF</b> et choisissez un calendrier déjà généré — vos données sont enregistrées <i>à l'intérieur du PDF</i>, tout réapparaît et vous ne corrigez que ce qui change. (Une sauvegarde CSV pour Excel reste disponible en bas de page.)
+  </div>
 
-<footer class="pied enveloppe">
-  <span id="compteur"></span>
-  <span>Mise à jour&nbsp;: <span id="maj"></span></span>
-</footer>
+  <div class="panel">
+    <h2>1 · Paramètres du calendrier</h2>
+    <div class="row">
+      <div class="field">
+        <label>Année scolaire (rentrée)</label>
+        <select id="annee" oninput="render()"></select>
+      </div>
+      <div class="field">
+        <label>Nom de la classe</label>
+        <input id="classe" value="" placeholder="ex. 1 BAC PRO AP" size="18" oninput="render()">
+      </div>
+      <div class="field">
+        <label>Zone (vacances)</label>
+        <select id="zone" oninput="render()">
+          <option value="A">Zone A</option>
+          <option value="B">Zone B</option>
+          <option value="C">Zone C</option>
+        </select>
+      </div>
+      <button class="btn-green" onclick="autoFill()">+ Ajouter vacances + jours fériés</button>
+    </div>
+    <p class="hint">Clermont-Ferrand = <b>Zone A</b> (académies de Besançon, Bordeaux, Clermont-Ferrand, Dijon, Grenoble, Limoges, Lyon, Poitiers). Les vacances sont les dates officielles du Ministère ; les jours fériés sont calculés automatiquement. Vous pouvez ensuite supprimer ou ajuster chaque période.</p>
+  </div>
+
+  <div class="panel">
+    <h2>2 · Ajouter un événement</h2>
+    <div class="row">
+      <div class="field" style="min-width:240px">
+        <label>Catégorie (couleur)</label>
+        <select id="ev-cat"></select>
+      </div>
+      <div class="field" style="min-width:200px">
+        <label>Précision de l'événement <span style="font-weight:400;color:#9aa3b5">(optionnel)</span></label>
+        <input id="ev-nom" placeholder="ex. E4 n°1, SST, Sommet…">
+      </div>
+      <div class="field">
+        <label>Date de début</label>
+        <input type="date" id="ev-debut">
+      </div>
+      <div class="field">
+        <label>Date de fin <span style="font-weight:400;color:#9aa3b5">(optionnel)</span></label>
+        <input type="date" id="ev-fin">
+      </div>
+      <button class="btn-primary" onclick="addEvent()">+ Ajouter</button>
+    </div>
+    <p class="hint">Date de fin vide = événement d'une seule journée. Début + fin = période complète (ex. une semaine de stage). <span id="range-hint"></span></p>
+  </div>
+
+  <div class="panel">
+    <h2>3 · Aperçu du calendrier <span style="font-weight:400;font-size:12px;color:#8893a7">(c'est exactement ce qui sera imprimé en PDF)</span></h2>
+    <div style="overflow-x:auto"><div id="cal-export"></div></div>
+  </div>
+
+  <div class="panel">
+    <h2>4 · Événements saisis (<span id="ev-count">0</span>)</h2>
+    <table class="evlist" id="ev-table">
+      <thead><tr><th>Catégorie</th><th>Précision</th><th>Début</th><th>Fin</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="hint" id="ev-empty">Aucun événement pour l'instant.</p>
+    <div class="toolbar" style="margin-top:12px">
+      <button class="btn-ghost" onclick="clearAuto()">Retirer vacances + fériés</button>
+      <button class="btn-ghost" onclick="if(confirm('Effacer TOUS les événements ?')){events=[];render()}">Tout effacer</button>
+      <button class="btn-ghost" onclick="exportCSV()">Sauvegarde CSV (Excel)</button>
+      <button class="btn-ghost" onclick="document.getElementById('csvin').click()">Importer un CSV</button>
+      <input type="file" id="csvin" accept=".csv,text/csv" style="display:none" onchange="importCSV(this.files[0])">
+    </div>
+  </div>
+
+</div>
 
 <script>
-const LIBELLES = {"en-ligne":"En ligne","en-test":"En test","a-venir":"À venir"};
+// ====================== CATEGORIES (legende fixe) ======================
+const CATEGORIES = [
+  {id:'visite',     label:'Visite médicale',                                   color:'#B4C6E7'},
+  {id:'stage_ent',  label:'Stage individuel en entreprise',                    color:'#70AD47'},
+  {id:'stage_choix',label:'Stage individuel : semaine au choix / rattrapage',  color:'#548235'},
+  {id:'stage_col',  label:'Stage collectif',                                   color:'#B1A0C7'},
+  {id:'immersion',  label:"Immersion sur l'exploitation agricole/horticole",   color:'#C6E0B4'},
+  {id:'voyage',     label:"Voyage d'étude",                                     color:'#33D6E6'},
+  {id:'caces',      label:'Certification CACES',                               color:'#C0504D'},
+  {id:'revisions',  label:'Révisions / examens blancs',                        color:'#FCE4D6'},
+  {id:'ccf',        label:'CCF',                                               color:'#ED7D31'},
+  {id:'examens',    label:'Concours et examens',                              color:'#FF0000'},
+  {id:'centre',     label:"Période de Centre d'examen",                        color:'#BFBFBF'},
+  {id:'vacances',   label:'Vacances scolaires',                               color:'#4472C4'},
+  {id:'ferie',      label:'Férié',                                            color:'#D9D9D9'},
+  {id:'fermeture',  label:'Fermeture administrative',                         color:'#595959'},
+];
+const CAT_GROUPS = [
+  {titre:'Formation en milieu professionnel, stages et voyages', ids:['visite','stage_ent','stage_choix','stage_col','immersion','voyage']},
+  {titre:"Préparation aux examens et examens",                    ids:['caces','revisions','ccf','examens','centre']},
+  {titre:'Autres périodes et événements',                        ids:['vacances','ferie','fermeture']},
+];
+const catById = id => CATEGORIES.find(c=>c.id===id) || CATEGORIES[0];
+function uniqueColors(evs){const out=[];evs.forEach(e=>{const c=catById(e.cat).color;if(out.indexOf(c)<0)out.push(c);});return out;}
+const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+const DOW=['D','L','M','M','J','V','S'];
 
-let donnees = null;
-let filtreActif = "tous";
+// ====================== VACANCES OFFICIELLES (Bulletin officiel) ======================
+const VACANCES = {
+  2025:{ common:[['Vacances de la Toussaint','2025-10-18','2025-11-02'],['Vacances de Noël','2025-12-20','2026-01-04'],["Vacances d'été",'2026-07-04','2026-08-31']],
+    A:[["Vacances d'hiver",'2026-02-07','2026-02-22'],['Vacances de printemps','2026-04-04','2026-04-19']],
+    B:[["Vacances d'hiver",'2026-02-14','2026-03-01'],['Vacances de printemps','2026-04-11','2026-04-26']],
+    C:[["Vacances d'hiver",'2026-02-21','2026-03-08'],['Vacances de printemps','2026-04-18','2026-05-03']] },
+  2026:{ common:[['Vacances de la Toussaint','2026-10-17','2026-11-01'],['Vacances de Noël','2026-12-19','2027-01-03'],["Vacances d'été",'2027-07-03','2027-08-31']],
+    A:[["Vacances d'hiver",'2027-02-13','2027-02-28'],['Vacances de printemps','2027-04-10','2027-04-25']],
+    B:[["Vacances d'hiver",'2027-02-20','2027-03-07'],['Vacances de printemps','2027-04-17','2027-05-02']],
+    C:[["Vacances d'hiver",'2027-02-06','2027-02-21'],['Vacances de printemps','2027-04-03','2027-04-18']] },
+  2027:{ common:[['Vacances de la Toussaint','2027-10-23','2027-11-07'],['Vacances de Noël','2027-12-18','2028-01-02'],["Vacances d'été",'2028-07-08','2028-08-31']],
+    A:[["Vacances d'hiver",'2028-02-12','2028-02-27'],['Vacances de printemps','2028-04-08','2028-04-23']],
+    B:[["Vacances d'hiver",'2028-02-19','2028-03-05'],['Vacances de printemps','2028-04-15','2028-04-30']],
+    C:[["Vacances d'hiver",'2028-02-26','2028-03-12'],['Vacances de printemps','2028-04-22','2028-05-07']] },
+};
 
-function echapper(s){
-  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// ====================== JOURS FERIES (calcules) ======================
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da);}
+function feriesYear(y){
+  const F=[[0,1,"Jour de l'An"],[4,1,'Fête du Travail'],[4,8,'Victoire 1945'],[6,14,'Fête nationale'],[7,15,'Assomption'],[10,1,'Toussaint'],[10,11,'Armistice'],[11,25,'Noël']];
+  const out=F.map(a=>[a[2],iso(new Date(y,a[0],a[1]))]);
+  const p=easter(y);
+  out.push(['Lundi de Pâques',iso(addDays(p,1))]);
+  out.push(['Ascension',iso(addDays(p,39))]);
+  out.push(['Lundi de Pentecôte',iso(addDays(p,50))]);
+  return out;
 }
 
-function formaterDate(iso){
-  if(!iso) return "";
-  const [a,m] = iso.split("-");
-  const mois = ["janv.","févr.","mars","avr.","mai","juin",
-                "juil.","août","sept.","oct.","nov.","déc."];
-  return m ? `${mois[parseInt(m,10)-1]} ${a}` : a;
+// ====================== ETAT ======================
+let events=[];
+
+(function init(){
+  const sel=document.getElementById('annee');
+  const cur=new Date().getFullYear();
+  for(let y=cur-1;y<=cur+3;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'-'+(y+1);sel.appendChild(o);}
+  sel.value=(new Date().getMonth()>=8)?cur:cur-1;
+  const cat=document.getElementById('ev-cat');
+  CAT_GROUPS.forEach(g=>{const og=document.createElement('optgroup');og.label=g.titre;g.ids.forEach(id=>{const c=catById(id);const o=document.createElement('option');o.value=id;o.textContent=c.label;og.appendChild(o)});cat.appendChild(og);});
+  render();
+})();
+
+// ====================== AJOUT / SUPPRESSION ======================
+function addEvent(){
+  const nom=document.getElementById('ev-nom').value.trim();
+  const cat=document.getElementById('ev-cat').value;
+  const debut=document.getElementById('ev-debut').value;
+  let fin=document.getElementById('ev-fin').value;
+  if(!debut){alert('Indiquez au moins une date de début.');return;}
+  if(!fin) fin=debut;
+  if(fin<debut){alert('La date de fin est avant la date de début.');return;}
+  events.push({id:uid(),nom:nom,cat:cat,debut:debut,fin:fin,auto:false});
+  const r=yearRange();
+  if(debut<r[0]||debut>r[1]) alert("Attention : cet événement est en dehors de l'année scolaire affichée ("+frDate(r[0])+" - "+frDate(r[1])+"). Il est enregistré mais n'apparaîtra pas sur ce calendrier.");
+  document.getElementById('ev-nom').value='';
+  document.getElementById('ev-debut').value='';
+  document.getElementById('ev-fin').value='';
+  render();
+}
+function delEvent(id){events=events.filter(e=>e.id!==id);render();}
+function clearAuto(){events=events.filter(e=>!e.auto);render();}
+
+function autoFill(){
+  clearAuto();
+  const y=+document.getElementById('annee').value, z=document.getElementById('zone').value;
+  const v=VACANCES[y];
+  if(v){
+    v.common.concat(v[z]||[]).forEach(a=>events.push({id:uid(),nom:a[0],cat:'vacances',debut:a[1],fin:a[2],auto:true}));
+  }else{
+    alert("Vacances non préchargées pour "+y+"-"+(y+1)+". Les jours fériés sont quand même ajoutés ; saisissez les vacances manuellement.");
+  }
+  const r=yearRange();
+  feriesYear(y).concat(feriesYear(y+1)).forEach(a=>{ if(a[1]>=r[0]&&a[1]<=r[1]) events.push({id:uid(),nom:a[0],cat:'ferie',debut:a[1],fin:a[1],auto:true}); });
+  // fermetures administratives : 25/12 -> 01/01, et derniere semaine de juillet + 2 premieres semaines d'aout
+  events.push({id:uid(),nom:'',cat:'fermeture',debut:y+'-12-25',fin:(y+1)+'-01-01',auto:true});
+  events.push({id:uid(),nom:'',cat:'fermeture',debut:(y+1)+'-07-25',fin:(y+1)+'-08-14',auto:true});
+  render();
+  alert((v?"Vacances (zone "+z+"), ":"")+"jours fériés et fermetures administratives ajoutés pour "+y+"-"+(y+1)+".");
 }
 
-function destination(o){
-  if(o.statut === "a-venir") return null;
-  return o.dossier ? `fiche.html?outil=${encodeURIComponent(o.dossier)}` : (o.url || null);
+// ====================== RENDU ======================
+function render(){
+  renderList(); renderCalendar();
+  const r=yearRange();
+  document.getElementById('range-hint').textContent='Année affichée : '+frDate(r[0])+' - '+frDate(r[1])+'.';
 }
-
-function rendreEntete(){
-  const p = donnees.profil || {};
-  if(p.intro) document.getElementById("intro").textContent = p.intro;
-  const l = [];
-  if(p.nom)           l.push(`<span class="cle">nom</span> = <span class="val">"${echapper(p.nom)}"</span>`);
-  if(p.fonction)      l.push(`<span class="cle">fonction</span> = "${echapper(p.fonction)}"`);
-  if(p.etablissement) l.push(`<span class="cle">etablissement</span> = "${echapper(p.etablissement)}"`);
-  if(p.note)          l.push(`<span class="commentaire"># ${echapper(p.note)}</span>`);
-  document.getElementById("config").innerHTML = l.map(x=>`<div>${x}</div>`).join("");
-}
-
-function rendreFiltres(){
-  const cats = [...new Set(donnees.outils.map(o=>o.categorie).filter(Boolean))].sort();
-  const box = document.getElementById("filtres");
-  box.innerHTML = "";
-  [["tous","Tous"], ...cats.map(c=>[c,c])].forEach(([val,lib])=>{
-    const b = document.createElement("button");
-    b.className = "filtre"; b.type = "button"; b.textContent = lib;
-    b.setAttribute("aria-pressed", String(val === filtreActif));
-    b.addEventListener("click", ()=>{ filtreActif = val; rendreFiltres(); rendreListe(); });
-    box.appendChild(b);
+function renderList(){
+  events.sort((a,b)=>a.debut.localeCompare(b.debut)||a.nom.localeCompare(b.nom));
+  const tb=document.querySelector('#ev-table tbody');tb.innerHTML='';
+  document.getElementById('ev-count').textContent=events.length;
+  document.getElementById('ev-empty').style.display=events.length?'none':'block';
+  document.getElementById('ev-table').style.display=events.length?'table':'none';
+  events.forEach(e=>{
+    const c=catById(e.cat);
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td><span class="swatch" style="background:'+c.color+'"></span>'+c.label+'</td>'
+      +'<td><b>'+esc(e.nom)+'</b>'+(e.auto?'<span class="tag">auto</span>':'')+'</td>'
+      +'<td>'+frDate(e.debut)+'</td>'
+      +'<td>'+(e.fin!==e.debut?frDate(e.fin):'<span style="color:#aaa">-</span>')+'</td>'
+      +'<td style="text-align:right"><button class="btn-danger" onclick="delEvent(\''+e.id+'\')">Supprimer</button></td>';
+    tb.appendChild(tr);
   });
 }
-
-function rendreListe(){
-  const visibles = donnees.outils
-    .filter(o => filtreActif === "tous" || o.categorie === filtreActif)
-    .sort((a,b) => (b.date||"").localeCompare(a.date||""));
-
-  const total = visibles.length;
-
-  document.getElementById("liste").innerHTML = visibles.map((o,i)=>{
-    const statut = o.statut || "en-ligne";
-    const num = String(i+1).padStart(2,"0") + " / " + String(total).padStart(2,"0");
-    const src = o.vignette && o.dossier ? `${o.dossier}/${o.vignette}` : o.vignette;
-    const visuel = src
-      ? `<img class="vignette" src="${echapper(src)}" alt="" loading="lazy">`
-      : `<div class="sans-vignette" aria-hidden="true">aperçu</div>`;
-
-    const corps = `
-      ${visuel}
-      <div class="contenu">
-        <p class="meta">
-          <span>${num}</span><span class="sep">·</span>
-          <span>${echapper(o.categorie||"")}</span><span class="sep">·</span>
-          <span class="badge ${echapper(statut)}">${echapper(LIBELLES[statut]||statut)}</span>
-        </p>
-        <h2>${echapper(o.titre)}${destination(o)?' <span class="fleche" aria-hidden="true">&rarr;</span>':''}</h2>
-        <p>${echapper(o.description||"")}</p>
-        ${o.usage ? `<p class="usage">${echapper(o.usage)}</p>` : ""}
-      </div>`;
-
-    const cible = destination(o);
-    return `<li class="outil">` +
-      (cible ? `<a class="bloc" href="${echapper(cible)}">${corps}</a>`
-             : `<div class="bloc">${corps}</div>`) +
-      `</li>`;
-  }).join("");
-
-  document.getElementById("vide").hidden = visibles.length > 0;
-
-  const n = donnees.outils.length;
-  document.getElementById("compteur").textContent =
-    n + (n > 1 ? " outils référencés" : " outil référencé");
-  document.getElementById("maj").textContent =
-    formaterDate(donnees.outils.map(o=>o.date).filter(Boolean).sort().pop());
+function renderCalendar(){
+  const startY=+document.getElementById('annee').value;
+  const classe=document.getElementById('classe').value||'';
+  const zone='ZONE '+document.getElementById('zone').value;
+  const cols=[];
+  for(let i=0;i<12;i++){const m=(8+i)%12;const y=startY+(8+i>=12?1:0);cols.push({m:m,y:y,nb:new Date(y,m+1,0).getDate()});}
+  const dayMap={},labelDay={};
+  events.forEach(e=>{
+    let d=new Date(e.debut+'T00:00'),end=new Date(e.fin+'T00:00');
+    while(d<=end){const k=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();(dayMap[k]=dayMap[k]||[]).push(e);d.setDate(d.getDate()+1);}
+    const d0=new Date(e.debut+'T00:00'),d1=new Date(e.fin+'T00:00'),len=Math.round((d1-d0)/864e5)+1,mid=new Date(d0);mid.setDate(d0.getDate()+Math.floor((len-1)/2));
+    labelDay[mid.getFullYear()+'-'+mid.getMonth()+'-'+mid.getDate()]=e.nom;
+  });
+  let h='<div class="cal-title"><div class="zone">'+esc(zone)+'</div><div class="name">'+esc(classe)+'</div><div class="corner"></div></div>';
+  h+='<table class="cal"><colgroup>'+cols.map(()=>'<col style="width:8.33%">').join('')+'</colgroup>';
+  h+='<thead><tr>'+cols.map(c=>'<th>'+MOIS[c.m]+' '+c.y+'</th>').join('')+'</tr></thead><tbody>';
+  for(let day=1;day<=31;day++){
+    h+='<tr>';
+    cols.forEach(c=>{
+      if(day>c.nb){h+='<td class="empty"></td>';return;}
+      const dow=new Date(c.y,c.m,day).getDay();
+      const k=c.y+'-'+c.m+'-'+day;
+      const evs=dayMap[k];
+      let style='',cls='';
+      if(dow===0||dow===6){cls='we';}
+      else if(evs&&evs.length){
+        const ecols=uniqueColors(evs);
+        if(ecols.length===1){style='background:'+ecols[0]+';color:'+txtColor(ecols[0]);}
+        else{const n=ecols.length,st=[];for(let z=0;z<n;z++){st.push(ecols[z]+' '+(z*100/n)+'%',ecols[z]+' '+((z+1)*100/n)+'%');}style='background:linear-gradient(90deg,'+st.join(',')+');color:'+txtColor(ecols[0]);}
+      }
+      const lbl=labelDay[k]?' <span class="lbl">'+esc(labelDay[k])+'</span>':'';
+      h+='<td class="'+cls+'" style="'+style+'"><span class="num">'+day+'</span><span class="dow">'+DOW[dow]+'</span>'+lbl+'</td>';
+    });
+    h+='</tr>';
+  }
+  h+='</tbody></table><div class="legend">';
+  CAT_GROUPS.forEach(g=>{h+='<div><h3>'+g.titre+'</h3>';g.ids.forEach(id=>{const c=catById(id);h+='<div class="item"><span class="swatch" style="background:'+c.color+'"></span>'+c.label+'</div>'});h+='</div>';});
+  h+='</div><div class="footnote">Calendrier prévisionnel — outil PP/Coordo. Données sauvegardées en CSV (bouton Enregistrer).</div>';
+  document.getElementById('cal-export').innerHTML=h;
 }
 
-fetch("outils.json?v=" + Date.now())
-  .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
-  .then(d => { donnees = d; rendreEntete(); rendreFiltres(); rendreListe(); })
-  .catch(() => {
-    document.getElementById("liste").innerHTML =
-      `<li class="vide">La liste des outils n'a pas pu être chargée.
-       Vérifiez que <code>outils.json</code> est présent à la racine
-       et que sa syntaxe est valide.</li>`;
+// ====================== PDF (généré en JS, couleurs + données embarquées) ======================
+const PDF_A='%%CALDATA:', PDF_B=':CALDATA%%';
+function genPDF(){
+  if(!events.length && !confirm("Aucun événement saisi. Générer quand même un calendrier vide ?")) return;
+  const bytes=buildPDF();
+  const blob=new Blob([bytes],{type:'application/pdf'});
+  download(blob,'Calendrier_'+slug(document.getElementById('classe').value||'classe')+'_'+document.getElementById('annee').value+'.pdf');
+}
+function buildPDF(){
+  const startY=+document.getElementById('annee').value;
+  const classe=document.getElementById('classe').value||'';
+  const zoneTxt='ZONE '+document.getElementById('zone').value;
+  const cols=[];for(let i=0;i<12;i++){const m=(8+i)%12;const y=startY+(8+i>=12?1:0);cols.push({m:m,y:y,nb:new Date(y,m+1,0).getDate()});}
+  const dayMap={},labelDay={};
+  events.forEach(e=>{
+    let d=new Date(e.debut+'T00:00'),end=new Date(e.fin+'T00:00');
+    while(d<=end){const k=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();(dayMap[k]=dayMap[k]||[]).push(e);d.setDate(d.getDate()+1);}
+    const d0=new Date(e.debut+'T00:00'),d1=new Date(e.fin+'T00:00'),len=Math.round((d1-d0)/864e5)+1,mid=new Date(d0);mid.setDate(d0.getDate()+Math.floor((len-1)/2));
+    labelDay[mid.getFullYear()+'-'+mid.getMonth()+'-'+mid.getDate()]=e.nom;
   });
+  const W=842,H=595,mL=20,mR=20,gW=W-mL-mR,colW=gW/12;
+  let c='';
+  const F=n=>{n=Math.round(n*100)/100;return String(n);};
+  const RG=h=>{h=(h||'#000000').replace('#','');return F(parseInt(h.substr(0,2),16)/255)+' '+F(parseInt(h.substr(2,2),16)/255)+' '+F(parseInt(h.substr(4,2),16)/255);};
+  const pdfEsc=s=>String(s).split('').map(ch=>{const cc=ch.charCodeAt(0);if(cc>255)return ch==='—'||ch==='–'?'-':'?';if(ch==='\\')return '\\\\';if(ch==='(')return '\\(';if(ch===')')return '\\)';return ch;}).join('');
+  const rect=(x,y,w,h,col)=>{c+=RG(col)+' rg '+F(x)+' '+F(y)+' '+F(w)+' '+F(h)+' re f\n';};
+  const srect=(x,y,w,h,col)=>{c+=RG(col||'#dddddd')+' RG 0.4 w '+F(x)+' '+F(y)+' '+F(w)+' '+F(h)+' re S\n';};
+  const text=(x,y,s,sz,col,bold)=>{c+='BT /'+(bold?'F2':'F1')+' '+sz+' Tf '+RG(col||'#000000')+' rg '+F(x)+' '+F(y)+' Td ('+pdfEsc(s)+') Tj ET\n';};
+
+  const titleTop=H-mL, titleH=20, headH=14;
+  rect(mL,titleTop-titleH,gW,titleH,'#2E5FA3');
+  rect(mL,titleTop-titleH,130,titleH,'#ffffff'); srect(mL,titleTop-titleH,130,titleH,'#2E5FA3');
+  text(mL+10,titleTop-titleH+6,zoneTxt,11,'#2E5FA3',true);
+  rect(W-mR-32,titleTop-titleH,32,titleH,'#E8763A');
+  text(mL+gW/2-classe.length*3.7,titleTop-titleH+6,classe,14,'#ffffff',true);
+
+  const headY=titleTop-titleH-headH;
+  cols.forEach((col,i)=>{const x=mL+i*colW;rect(x,headY,colW,headH,'#E8763A');srect(x,headY,colW,headH,'#ffffff');text(x+4,headY+4,MOIS[col.m]+' '+col.y,7,'#ffffff',true);});
+
+  const rowsTop=headY, legendH=98, rowsBottom=20+legendH, rowH=(rowsTop-rowsBottom)/31;
+  for(let day=1;day<=31;day++){
+    cols.forEach((col,i)=>{
+      const x=mL+i*colW, cy=rowsTop-day*rowH;
+      if(day>col.nb){rect(x,cy,colW,rowH,'#fafafa');srect(x,cy,colW,rowH,'#f0f0f0');return;}
+      const dow=new Date(col.y,col.m,day).getDay(), k=col.y+'-'+col.m+'-'+day, evs=dayMap[k], we=(dow===0||dow===6);
+      let first=null;
+      if(we){ rect(x,cy,colW,rowH,'#ececec'); }
+      else if(evs&&evs.length){
+        const ec=uniqueColors(evs), n=ec.length, bw=colW/n;
+        for(let z=0;z<n;z++) rect(x+z*bw,cy,bw,rowH,ec[z]);
+        first=ec[0];
+      }
+      srect(x,cy,colW,rowH,'#e2e2e2');
+      const tcol=first?txtColor(first):'#333333';
+      text(x+2,cy+rowH/2-2.3,day+' '+DOW[dow],6.3,tcol,false);
+      if(labelDay[k]) text(x+16,cy+rowH/2-2.3,labelDay[k],6,tcol,true);
+    });
+  }
+  const gx=[mL,mL+gW/3,mL+2*gW/3], legTop=rowsBottom-8;
+  CAT_GROUPS.forEach((g,gi)=>{
+    let yy=legTop;
+    text(gx[gi],yy,g.titre,7,'#333333',true); yy-=12;
+    g.ids.forEach(id=>{const cc=catById(id);rect(gx[gi],yy-1,10,7,cc.color);srect(gx[gi],yy-1,10,7,'#999999');text(gx[gi]+14,yy,cc.label,6,'#222222',false);yy-=10;});
+  });
+
+  const objs=[];
+  objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
+  objs[2]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+  objs[3]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>';
+  objs[4]='<< /Length '+c.length+' >>\nstream\n'+c+'endstream';
+  objs[5]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objs[6]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  let pdf='%PDF-1.4\n', off=[0];
+  for(let i=1;i<=6;i++){off[i]=pdf.length;pdf+=i+' 0 obj\n'+objs[i]+'\nendobj\n';}
+  const xrefPos=pdf.length;
+  pdf+='xref\n0 7\n0000000000 65535 f \n';
+  for(let i=1;i<=6;i++) pdf+=String(off[i]).padStart(10,'0')+' 00000 n \n';
+  pdf+='trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n'+xrefPos+'\n%%EOF\n';
+  const data=JSON.stringify({v:1,annee:document.getElementById('annee').value,classe:classe,zone:document.getElementById('zone').value,events:events});
+  pdf+=PDF_A+btoa(unescape(encodeURIComponent(data)))+PDF_B+'\n';
+  const bytes=new Uint8Array(pdf.length);
+  for(let i=0;i<pdf.length;i++) bytes[i]=pdf.charCodeAt(i)&0xff;
+  return bytes;
+}
+async function importPDF(file){
+  if(!file)return;
+  const buf=new Uint8Array(await file.arrayBuffer());
+  let s='';const CH=0x8000;for(let i=0;i<buf.length;i+=CH)s+=String.fromCharCode.apply(null,buf.subarray(i,i+CH));
+  const i=s.lastIndexOf(PDF_A), j=s.lastIndexOf(PDF_B);
+  if(i<0||j<0||j<i){alert("Ce PDF ne contient pas de données rechargeables.\nUtilisez un PDF généré par cet outil (bouton « Générer le calendrier en PDF »).");document.getElementById('pdfin').value='';return;}
+  try{
+    const b64=s.substring(i+PDF_A.length,j).replace(/[^A-Za-z0-9+/=]/g,'');
+    const data=JSON.parse(decodeURIComponent(escape(atob(b64))));
+    if(data.annee) setAnnee(data.annee);
+    if(data.classe!=null) document.getElementById('classe').value=data.classe;
+    if(data.zone) document.getElementById('zone').value=data.zone;
+    events=(data.events||[]).map(e=>({id:uid(),cat:catById(e.cat).id,nom:e.nom,debut:e.debut,fin:e.fin,auto:!!e.auto}));
+    render();
+    alert('PDF rechargé : '+events.length+' événement(s) restauré(s). Modifiez puis régénérez le PDF.');
+  }catch(err){alert("Impossible de lire les données de ce PDF.");console.error(err);}
+  document.getElementById('pdfin').value='';
+}
+
+// ====================== CSV ======================
+function exportCSV(){
+  const annee=document.getElementById('annee').value, classe=document.getElementById('classe').value, zone=document.getElementById('zone').value;
+  const head=['annee','classe','zone','categorie','precision','debut','fin','auto'];
+  const rows=[head.join(';')];
+  const list=events.length?events:[{cat:'',nom:'',debut:'',fin:'',auto:false}];
+  list.forEach(e=>{ rows.push([annee,classe,zone,e.cat,e.nom,e.debut,e.fin,e.auto?'1':'0'].map(csvCell).join(';')); });
+  const bom=String.fromCharCode(0xFEFF);
+  const blob=new Blob([bom+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  download(blob,'Calendrier_'+slug(classe)+'_'+annee+'.csv');
+}
+async function importCSV(file){
+  if(!file)return;
+  let text=await file.text(); if(text.charCodeAt(0)===65279) text=text.slice(1);
+  const rows=parseCSV(text).filter(r=>r.length && r.some(c=>c!==''));
+  if(rows.length<1){alert('Fichier CSV vide.');return;}
+  const head=rows[0].map(s=>s.trim().toLowerCase());
+  const idx=n=>head.indexOf(n);
+  const data=rows.slice(1);
+  if(data.length){
+    const r0=data[0];
+    if(idx('annee')>=0&&r0[idx('annee')]) setAnnee(r0[idx('annee')]);
+    if(idx('classe')>=0) document.getElementById('classe').value=r0[idx('classe')]||'';
+    if(idx('zone')>=0&&r0[idx('zone')]){var z=r0[idx('zone')].toUpperCase().replace('ZONE ','').trim();document.getElementById('zone').value=z||'A';}
+  }
+  events=[];
+  data.forEach(r=>{
+    const cat=(r[idx('categorie')]||'').trim(), nom=(r[idx('precision')]||'').trim(), deb=(r[idx('debut')]||'').trim(), fin=(r[idx('fin')]||'').trim();
+    if(!deb)return;
+    events.push({id:uid(),cat:catById(cat).id,nom:nom,debut:deb,fin:fin||deb,auto:(r[idx('auto')]||'')==='1'});
+  });
+  render();
+  document.getElementById('csvin').value='';
+  alert('CSV rechargé : '+events.length+' événement(s) restauré(s). Modifiez puis régénérez le PDF.');
+}
+function parseCSV(t){
+  const rows=[];let row=[],cur='',q=false;
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){ if(ch==='"'){ if(t[i+1]==='"'){cur+='"';i++} else q=false; } else cur+=ch; }
+    else{ if(ch==='"')q=true; else if(ch===';'){row.push(cur);cur=''} else if(ch==='\n'){row.push(cur);rows.push(row);row=[];cur=''} else if(ch==='\r'){} else cur+=ch; }
+  }
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+function csvCell(v){v=String(v==null?'':v);return /[";\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+
+// ====================== UTILS ======================
+function uid(){return 'e'+Math.random().toString(36).slice(2,9);}
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function frDate(d){if(!d)return'';const p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function yearRange(){const y=+document.getElementById('annee').value;return[y+'-09-01',(y+1)+'-08-31'];}
+function setAnnee(v){const sel=document.getElementById('annee');if(![...sel.options].some(o=>o.value==v)){const o=document.createElement('option');o.value=v;o.textContent=v+'-'+(+v+1);sel.appendChild(o);}sel.value=v;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function slug(s){return(s||'classe').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function txtColor(hex){const c=hex.replace('#','');const r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),b=parseInt(c.substr(4,2),16);return(0.299*r+0.587*g+0.114*b)<140?'#fff':'#1c1c1c';}
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);}
 </script>
 </body>
 </html>
