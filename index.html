@@ -275,7 +275,7 @@ function rendreListe(){
     const src = o.vignette && o.dossier ? `${o.dossier}/${o.vignette}` : o.vignette;
     const visuel = src
       ? `<img class="vignette" src="${echapper(src)}" alt="" loading="lazy">`
-      : `<div class="sans-vignette" aria-hidden="true">aperçu</div>`;
+      : "";
 
     const corps = `
       ${visuel}
