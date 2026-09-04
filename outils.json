@@ -7,10 +7,20 @@
   },
   "outils": [
     {
+      "dossier": "calendrier-pedagogique",
+      "titre": "Calendrier de classe & calendrier pédagogique (v2)",
+      "description": "Deux espaces dans un seul fichier. Les professeurs principaux et coordonnateurs construisent le calendrier prévisionnel de leur classe, congés et jours fériés placés automatiquement selon la zone, puis l'exportent en PDF. Le responsable recharge tous ces PDF d'un coup : chaque ligne de classe se remplit toute seule et le calendrier pédagogique de synthèse s'exporte en une page, semaine par semaine.",
+      "usage": "Professeurs principaux et coordonnateurs pour la saisie ; responsable pédagogique pour la synthèse présentée en instance.",
+      "vignette": "images/calendrier-pedagogique-4.png",
+      "categorie": "Organisation",
+      "statut": "en-ligne",
+      "date": "2026-09"
+    },
+    {
       "dossier": "calendrier-classe",
-      "titre": "Générateur de calendrier de classe",
-      "description": "Construit le calendrier prévisionnel annuel d'une classe en quelques minutes : congés et jours fériés placés automatiquement selon la zone, puis saisie des temps forts de la filière. Le calendrier s'exporte en PDF prêt à imprimer, et se recharge tel quel pour ne corriger que ce qui change.",
-      "usage": "Professeurs principaux et coordonnateurs, en amont de la synthèse présentée au conseil d'administration.",
+      "titre": "Générateur de calendrier de classe (v1)",
+      "description": "Version précédente, maintenue en ligne le temps de la transition vers la v2. Construit le calendrier prévisionnel annuel d'une classe : congés et jours fériés placés automatiquement selon la zone, puis saisie des temps forts de la filière. Le calendrier s'exporte en PDF prêt à imprimer, et se recharge tel quel pour ne corriger que ce qui change.",
+      "usage": "Professeurs principaux et coordonnateurs. Pour un nouveau calendrier, préférez désormais la version 2.",
       "vignette": "images/calendrier-classe-2.png",
       "categorie": "Organisation",
       "statut": "en-test",
