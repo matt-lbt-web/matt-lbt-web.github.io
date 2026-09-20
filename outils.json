@@ -7,8 +7,18 @@
   },
   "outils": [
     {
+      "dossier": "tableau-bord-recrutement",
+      "titre": "Tableau de bord du recrutement",
+      "description": "Transforme les exports FRÉGATA en outil de pilotage du recrutement, dans l'esprit du Programme national d'orientation et de découverte des métiers du vivant (PNOD). Chaque écran répond à une question d'un coup d'œil : vue d'ensemble des effectifs et des nouveaux entrants, bassin de recrutement cartographié, divisions face aux seuils de dédoublement, profil des inscrits et évolution pluriannuelle par filière. Les fichiers sont traités localement dans le navigateur et ne sont jamais transmis à l'IA.",
+      "usage": "Direction et équipes de pilotage, pour bâtir et suivre une stratégie de recrutement à l'échelle de l'établissement.",
+      "vignette": "images/2-vue-ensemble.jpg",
+      "categorie": "Recrutement",
+      "statut": "en-ligne",
+      "date": "2026-09"
+    },
+    {
       "dossier": "calendrier-pedagogique",
-      "titre": "Calendrier de classe & calendrier pédagogique (v2)",
+      "titre": "Calendrier de classe & calendrier pédagogique",
       "description": "Construit le calendrier prévisionnel annuel d'une classe : congés et jours fériés placés automatiquement selon la zone, puis saisie des temps forts de la filière. Deux espaces dans un seul fichier. Les professeurs principaux et coordonnateurs bâtissent le calendrier de leur classe, l'exportent en PDF prêt à imprimer, et le rechargent tel quel pour ne corriger que ce qui change. Le responsable pédagogique recharge ensuite tous ces PDF d'un coup : chaque ligne de classe se remplit toute seule et le calendrier pédagogique de synthèse s'exporte en une page, semaine par semaine, prêt à présenter en instance.",
       "usage": "Professeurs principaux et coordonnateurs pour la saisie ; responsable pédagogique pour la synthèse présentée en instance.",
       "vignette": "images/calendrier-pedagogique-4.png",
