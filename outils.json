@@ -7,6 +7,16 @@
   },
   "outils": [
     {
+      "dossier": "dgh-guepard",
+      "titre": "Carnet de bord Guepard",
+      "description": "Fait de l'extraction Guepard un support d'animation pour les réunions de chaire et de filière, et un carnet de bord qui mémorise l'historique des décisions. Chaque printemps, il faut répartir la dotation globale horaire matière par matière : l'outil réconcilie la fiche de service de l'enseignant et la vision globale de la direction. Cinq écrans — chargement des extractions, mode chaire, non affecté et dispositifs, fiches de service, et journal des décisions horodaté qui se cumule d'une réunion à l'autre par export et rechargement d'un fichier Excel. Une fois les réunions conduites, ce carnet guide la saisie du nouveau scénario Guepard. Les fichiers sont traités localement et ne sont jamais transmis à l'IA.",
+      "usage": "Direction et enseignants, pour animer les réunions de chaire et de filière et préparer la ventilation de la DGH.",
+      "vignette": "images/2-chaire.jpg",
+      "categorie": "Pilotage des moyens",
+      "statut": "en-ligne",
+      "date": "2026-09"
+    },
+    {
       "dossier": "tableau-bord-recrutement",
       "titre": "Tableau de bord du recrutement",
       "description": "Transforme les exports FRÉGATA en outil de pilotage du recrutement, dans l'esprit du Programme national d'orientation et de découverte des métiers du vivant (PNOD). Chaque écran répond à une question d'un coup d'œil : vue d'ensemble des effectifs et des nouveaux entrants, bassin de recrutement cartographié, divisions face aux seuils de dédoublement, profil des inscrits et évolution pluriannuelle par filière. Les fichiers sont traités localement dans le navigateur et ne sont jamais transmis à l'IA.",
