@@ -1,0 +1,2534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de bord recrutement — export FRÉGATA</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --vert:#2e6e4e; --vert-fonce:#1d4a33; --vert-clair:#e7f2ec;
+    --or:#c9a227; --gris:#5a6b62; --bg:#f4f7f5; --card:#ffffff;
+    --rouge:#c0483b; --orange:#d98e30; --texte:#22322b; --violet:#7a5c99;
+    --ombre:0 1px 3px rgba(20,50,35,.08),0 1px 2px rgba(20,50,35,.06);
+    /* Palette de données (validée CVD) — distincte des couleurs institutionnelles */
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --grille:#eef3f0; --encre2:#52514e; --encre3:#8a948f;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}   /* sinon nav{display:flex} l'emporte sur l'attribut */
+  body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--texte);line-height:1.5}
+  header{background:linear-gradient(120deg,var(--vert-fonce),var(--vert));color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative;z-index:1300}
+  header .logo{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:23px}
+  header h1{font-size:18px;margin:0;font-weight:600}
+  header .sub{font-size:12.5px;opacity:.85;margin-top:2px}
+  .etat{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .badge{background:rgba(255,255,255,.16);color:#fff;font-weight:600;font-size:11.5px;padding:5px 11px;border-radius:20px;letter-spacing:.2px;white-space:nowrap}
+  .badge.vide{background:var(--or);color:#2a2200;font-weight:700}
+  .badge.local{background:rgba(255,255,255,.1)}
+  nav{background:#fff;display:flex;gap:2px;padding:0 16px;border-bottom:1px solid #dde7e1;overflow-x:auto;position:sticky;top:0;z-index:1200}
+  nav button{background:none;border:none;padding:13px 15px;font-size:14px;color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500}
+  nav button:hover{color:var(--vert)}
+  nav button.actif{color:var(--vert-fonce);border-bottom-color:var(--vert);font-weight:600}
+  nav button[disabled]{opacity:.4;cursor:not-allowed}
+  main{padding:20px;max-width:1320px;margin:0 auto}
+  .tab{display:none}
+  .tab.actif{display:block;animation:f .22s ease}
+  @keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  h2.section{font-size:16px;margin:4px 0 6px;color:var(--vert-fonce);display:flex;align-items:center;gap:8px}
+  h2.section::before{content:"";width:5px;height:18px;background:var(--or);border-radius:3px}
+  p.chapo{font-size:13px;color:var(--gris);margin:0 0 16px 13px;max-width:900px}
+  .grid{display:grid;gap:14px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(168px,1fr));margin-bottom:18px}
+  .kpi{background:var(--card);border-radius:12px;padding:13px 15px;box-shadow:var(--ombre);border-left:4px solid var(--vert)}
+  .kpi .lbl{font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:.4px}
+  .kpi .val{font-size:25px;font-weight:700;color:var(--vert-fonce);margin:3px 0 1px;font-variant-numeric:tabular-nums}
+  .kpi .delta{font-size:11.5px;color:var(--gris)}
+  .kpi .delta.up{color:var(--vert);font-weight:600} .kpi .delta.down{color:var(--rouge);font-weight:600}
+  .kpi.or{border-left-color:var(--or)} .kpi.bleu{border-left-color:var(--s1)}
+  .kpi.orange{border-left-color:var(--s2)} .kpi.violet{border-left-color:var(--violet)}
+  .kpi.rouge{border-left-color:var(--rouge)}
+  .card{background:var(--card);border-radius:12px;padding:16px 18px;box-shadow:var(--ombre)}
+  .card h3{margin:0 0 4px;font-size:14.5px;color:var(--vert-fonce)}
+  .card .hint{font-size:12px;color:var(--gris);margin:0 0 12px}
+  .two{grid-template-columns:1fr 1fr}
+  .three{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+  .chart-wrap{position:relative;height:290px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--grille)}
+  th{color:var(--gris);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr:hover{background:#f8fbf9}
+  .scroll{max-height:430px;overflow:auto}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+  .pill.ok{background:#e2f3e9;color:#1d6b3f} .pill.moy{background:#fdf1dc;color:#8a5d10} .pill.bas{background:#fbe4e1;color:#9a2c22}
+  .pill.neutre{background:#eef3f0;color:var(--gris)}
+  select,input[type=text],input[type=number]{font-size:13.5px;padding:6px 10px;border-radius:8px;border:1px solid #cddbd2;background:#fff;color:var(--texte)}
+  select{min-width:230px;position:relative;z-index:40}
+  label.sel{font-size:12px;color:var(--gris);display:block;margin-bottom:5px;font-weight:600}
+  .coche{background:#fff;border:1px solid #cddbd2;border-radius:10px;padding:8px 10px;max-height:250px;overflow:auto;min-width:340px}
+  .coche .barre{display:flex;gap:6px;align-items:center;position:sticky;top:0;background:#fff;padding-bottom:6px;margin-bottom:4px;border-bottom:1px solid #eef3f0;z-index:2}
+  .coche .barre b{font-size:11.5px;color:var(--gris);font-weight:600;margin-right:auto}
+  .coche .barre button{font-size:11px;padding:3px 8px;border:1px solid #cddbd2;background:#fff;border-radius:6px;cursor:pointer;color:var(--vert-fonce)}
+  .coche .barre button:hover{background:var(--vert-clair)}
+  .coche label{display:flex;align-items:center;gap:7px;font-size:12.5px;padding:2px 0;cursor:pointer;line-height:1.35}
+  .coche label.fil{font-weight:700;color:var(--vert-fonce);margin-top:6px}
+  .coche label.div{padding-left:18px}
+  .coche .lib{color:var(--gris);font-size:11.5px}
+  .coche .cnt{margin-left:auto;color:var(--gris);font-variant-numeric:tabular-nums;font-size:11.5px;padding-left:10px}
+  .divrow{display:flex;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px solid var(--grille)}
+  .divrow .ident{width:210px;flex:0 0 210px}
+  .divrow .code{font-weight:700;color:var(--vert-fonce);font-size:13px}
+  .divrow .lib{display:block;color:var(--gris);font-size:11px}
+  .divrow .eff{width:74px;flex:0 0 74px;text-align:right;font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:700}
+  .divrow .barre{flex:1;position:relative;height:20px;background:#eef3f0;border-radius:5px}
+  .divrow .barre .fill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--s1)}
+  .divrow .barre .seuil{position:absolute;top:-4px;bottom:-4px;width:2px;background:#8a948f}
+  .divrow .barre .seuil span{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9.5px;color:var(--gris)}
+  .divrow .etat{width:96px;flex:0 0 96px;text-align:right;font-size:11.5px;color:var(--gris)}
+  .barre-filtres{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;background:#fff;padding:12px 16px;border-radius:12px;box-shadow:var(--ombre)}
+  button.act{background:var(--vert);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+  button.act:hover{background:var(--vert-fonce)}
+  button.act.sec{background:#fff;color:var(--vert-fonce);border:1px solid #cddbd2}
+  button.act.sec:hover{background:var(--vert-clair)}
+  button.act[disabled]{opacity:.45;cursor:not-allowed}
+  #map-carte{height:460px;border-radius:12px;position:relative;z-index:0;isolation:isolate;background:#eef3f0}
+  .leaflet-container{z-index:0}
+  .leaflet-pane,.leaflet-top,.leaflet-bottom,.leaflet-control{z-index:1 !important}
+  .map-legende{font-size:12px;color:var(--gris);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap}
+  .lg{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+  #accueil{max-width:900px;margin:0 auto;padding:26px 20px 40px}
+  #accueil .intro{font-size:13.5px;color:var(--gris);text-align:center;margin-bottom:22px}
+  .zone{border:2px dashed #b9cdc2;border-radius:14px;padding:24px 26px;background:#fff;transition:.15s;cursor:pointer;margin-bottom:18px}
+  .zone:hover,.zone.survol{background:var(--vert-clair)}
+  .zone.bleue{border-color:#9fbcd8}
+  .zone.bleue:hover,.zone.bleue.survol{background:#eef4fa}
+  .zone.verte{border-color:#a8cdb5}
+  .zone .ico{font-size:30px;text-align:center}
+  .zone .titre code{background:rgba(32,75,115,.08);padding:1px 7px;border-radius:5px;font-size:15px}
+  .zone .titre{font-size:16px;font-weight:700;color:var(--vert-fonce);text-align:center;margin:8px 0 3px}
+  .zone.bleue .titre{color:#204b73}
+  .zone .ss{font-size:12.5px;color:var(--gris);text-align:center;margin-bottom:14px}
+  .check{list-style:none;margin:0 auto;padding:0;max-width:560px}
+  .check li{display:flex;align-items:baseline;gap:9px;font-size:13px;padding:5px 0;color:var(--gris)}
+  .check li .puce{width:15px;flex:0 0 15px;text-align:center;font-size:12px}
+  .check li.ok{color:var(--texte)}
+  .check li.ok .puce{color:var(--vert)}
+  .check li .det{margin-left:auto;font-size:11.5px;color:var(--gris);text-align:right}
+  .check li.ok .det{color:var(--vert-fonce);font-weight:600}
+  #btn-commencer{display:block;margin:6px auto 0;font-size:15px;padding:11px 26px}
+  .depot{background:#fff;border:2px dashed #b9cdc2;border-radius:12px;padding:26px 20px;text-align:center;transition:.15s}
+  .depot.survol{border-color:var(--vert);background:var(--vert-clair)}
+  .depot .gros{font-size:15px;font-weight:700;color:var(--vert-fonce);margin-bottom:4px}
+  .depot .pt{font-size:12.5px;color:var(--gris);margin-bottom:12px}
+  .note{background:var(--vert-clair);border-radius:10px;padding:11px 14px;font-size:12.5px;color:var(--vert-fonce)}
+  .note.alerte{background:#fdf1dc;color:#7a5210}
+  .note.rgpd{background:#eef3f8;color:#284a6b}
+  .mt{margin-top:14px}
+  .src{font-size:11px;color:var(--encre3);margin-top:6px;font-style:italic}
+  .vide-etat{background:#fff;border-radius:12px;padding:46px 24px;text-align:center;box-shadow:var(--ombre)}
+  .vide-etat .ico{font-size:40px}
+  .vide-etat h3{margin:10px 0 6px;color:var(--vert-fonce);font-size:17px}
+  .vide-etat p{color:var(--gris);font-size:13.5px;margin:0 auto 16px;max-width:520px}
+  .divcard{border:1px solid #e6ede9;border-radius:10px;padding:12px 14px;margin-bottom:10px}
+  .divcard .haut{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  .divcard .nom{font-weight:700;color:var(--vert-fonce);font-size:14px}
+  .divcard .meta{font-size:11.5px;color:var(--gris)}
+  .seuilbar{position:relative;height:22px;background:#eef3f0;border-radius:6px;margin-top:14px}
+  .seuilbar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+  .seuilbar .seuil{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--violet)}
+  .seuilbar .seuil span{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9.5px;color:var(--violet);white-space:nowrap}
+  .badges{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .bdg{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px}
+  .bdg.moyens{background:#efe9f6;color:#5b3f86}
+  .bdg.souscap{background:#fbe4e1;color:#9a2c22}
+  .bdg.depassement{background:var(--rouge);color:#fff}
+  .divcard.depasse{border-color:#efc2bb;background:#fffaf9}
+  .seuilbar .fill.exces{background:repeating-linear-gradient(135deg,var(--rouge),var(--rouge) 5px,#d96355 5px,#d96355 10px)}
+  .seuilbar .seuil.haut{width:3px;background:#5b3f86}
+  .seuilbar .seuil.haut span{font-weight:700}
+  .bdg.interne{background:#e2f3e9;color:#1d6b3f}
+  .seuil-inputs{display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--gris)}
+  .seuil-inputs input{width:54px;padding:3px 6px;font-size:12px;text-align:right}
+  .anomalie{border-left:3px solid var(--orange);padding:8px 12px;margin-bottom:8px;background:#fff;border-radius:0 8px 8px 0}
+  .anomalie.grave{border-left-color:var(--rouge)}
+  .anomalie.ok{border-left-color:var(--vert)}
+  .anomalie .t{font-weight:600;font-size:13px}
+  .anomalie .d{font-size:12px;color:var(--gris)}
+  .cols{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .coltag{font-size:10.5px;font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef3f0;color:var(--gris);padding:2px 6px;border-radius:4px}
+  .coltag.abs{background:#fbe4e1;color:#9a2c22}
+  .coltag.ok{background:#e2f3e9;color:#1d6b3f}
+  details summary{cursor:pointer;font-size:13px;color:var(--vert-fonce);font-weight:600;padding:4px 0}
+  .barmini{height:8px;border-radius:4px;background:var(--grille);position:relative;min-width:60px}
+  .barmini i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--s1)}
+  @media(max-width:900px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🌿</div>
+  <div>
+    <h1 id="h-titre">Pilotage du recrutement</h1>
+    <div class="sub" id="h-sous">Établissement identifié automatiquement à partir de l'export FRÉGATA</div>
+  </div>
+  <div class="etat">
+    <span class="badge local">🔒 traitement 100 % local</span>
+    <span class="badge vide" id="badge-etat">Aucune donnée chargée</span>
+  </div>
+</header>
+
+<section id="accueil">
+  <p class="intro">Tout se passe dans ce navigateur : les fichiers ne sont envoyés nulle part.</p>
+
+  <div class="zone bleue" id="zone-exports">
+    <div class="ico">📂</div>
+    <div class="titre">Charger vos exports FRÉGATA : <code>apprenants.csv</code></div>
+    <div class="ss">Cliquez ou glissez‑déposez — vous pouvez sélectionner plusieurs rentrées d'un coup</div>
+    <ul class="check" id="checklist"></ul>
+    <input type="file" id="imp-accueil" accept=".txt,.csv,.tsv,.htm,.html,.xls" multiple hidden>
+  </div>
+
+  <div class="src" id="msg-reglages" style="text-align:center"></div>
+  <button class="act" id="btn-commencer" disabled>Ouvrir le tableau de bord →</button>
+</section>
+
+<nav id="nav" hidden>
+  <button class="actif" data-tab="apercu">Vue d'ensemble</button>
+  <button data-tab="divisions">Divisions &amp; seuils</button>
+  <button data-tab="bassin">Bassin de recrutement</button>
+  <button data-tab="profil">Profil des inscrits</button>
+  <button data-tab="compare">Évolution pluriannuelle</button>
+  <button data-tab="donnees">Import &amp; fiabilité</button>
+</nav>
+
+<main hidden>
+
+<!-- ======================= VUE D'ENSEMBLE ======================= -->
+<section id="apercu" class="tab actif">
+  <div id="apercu-vide" class="vide-etat">
+    <div class="ico">📄</div>
+    <h3>Déposez votre export FRÉGATA pour démarrer</h3>
+    <p>Le tableau de bord ne contient aucune donnée de démonstration : tout ce qu'il affiche vient de votre fichier.
+       Aucune donnée ne quitte votre navigateur.</p>
+    <button class="act" onclick="allerA('donnees')">Aller à l'import</button>
+  </div>
+  <div id="apercu-contenu" hidden>
+    <h2 class="section">Vue d'ensemble <span id="titre-rentree" style="font-weight:400;color:var(--gris);font-size:13px"></span></h2>
+    <p class="chapo">Photographie de l'effectif tel qu'il figure dans l'export, après application des filtres ci‑dessous.</p>
+    <div class="barre-filtres" id="filtres"></div>
+    <div class="grid kpis" id="kpi-apercu"></div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Effectif par cycle</h3>
+        <div class="hint">Regroupement calculé à partir du libellé de formation.</div>
+        <div class="chart-wrap" id="w-cycle"><canvas id="ch-cycle"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Effectif par tronc thématique</h3>
+        <div class="hint">Général (voie scientifique) · Agricole (production, STAV, ACSE, ANABIOTEC) · Végétal (paysage, horticulture, vente).</div>
+        <div class="chart-wrap" id="w-tronc"><canvas id="ch-tronc"></canvas></div>
+      </div>
+    </div>
+    <div class="grid two mt">
+      <div class="card">
+        <h3>Les 12 divisions les plus nombreuses</h3>
+        <div class="hint">Vue complète et seuils dans l'onglet « Divisions &amp; seuils ».</div>
+        <div class="chart-wrap" id="w-div"><canvas id="ch-div"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Origine de l'effectif</h3>
+        <div class="hint">Part venant de l'enseignement agricole, de l'établissement lui‑même, et part de nouveaux entrants.</div>
+        <table id="tab-origine-synth"><tbody></tbody></table>
+        <div class="src">Colonnes « Dernier étab. EA », « Antér.N‑1 : étab. » et « Date entrée étab. ».</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= DIVISIONS & SEUILS ======================= -->
+<section id="divisions" class="tab">
+  <h2 class="section">Divisions &amp; seuils</h2>
+  <p class="chapo">Les effectifs viennent de l'export ; les seuils n'y figurent pas et sont saisis ici.
+     Les repères gris marquent les seuils : franchir un seuil ouvre des moyens, mais ce n'est en soi
+     ni un bon ni un mauvais résultat — l'affichage reste neutre.</p>
+  <div class="grid kpis" id="kpi-div"></div>
+  <div class="barre-filtres">
+    <div>
+      <label class="sel">Divisions affichées</label>
+      <div id="sel-div-divisions"></div>
+    </div>
+    <div>
+      <label class="sel">Seuils appliqués</label>
+      <div class="seuil-inputs" style="padding:6px 0">
+        <input type="number" min="0" max="99" id="s-glob-1" class="in-glob">
+        <input type="number" min="0" max="99" id="s-glob-2" class="in-glob">
+        <input type="number" min="0" max="99" id="s-glob-3" class="in-glob">
+        <span style="margin-left:6px">pour toutes les divisions</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button class="act sec" onclick="exporterSeuils()">Exporter (JSON)</button>
+        <button class="act sec" onclick="document.getElementById('imp-seuils').click()">Importer</button>
+        <input type="file" id="imp-seuils" accept=".json" hidden>
+        <button class="act sec" onclick="reinitSeuils()">Réinitialiser</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div id="liste-divisions"></div>
+  </div>
+  <details class="card mt">
+    <summary>Seuils propres à certaines divisions</summary>
+    <div class="hint mt">À n'utiliser que pour les divisions qui échappent à la règle générale.</div>
+    <div class="scroll mt"><table id="tab-seuils"><thead><tr><th>Division</th><th class="num">Effectif</th><th>Seuils</th><th></th></tr></thead><tbody></tbody></table></div>
+  </details>
+</section>
+
+<!-- ======================= BASSIN ======================= -->
+<section id="bassin" class="tab">
+  <h2 class="section">Bassin de recrutement</h2>
+  <p class="chapo" id="chapo-bassin">Où se recrute l'établissement : au choix, le domicile des apprenants ou l'établissement
+     qu'ils fréquentaient l'an dernier. Aucun nom ni aucune adresse n'est affiché.</p>
+
+  <div class="barre-filtres">
+    <div>
+      <label class="sel" for="sel-vue">Vue</label>
+      <select id="sel-vue" style="min-width:330px">
+        <option value="communes">Commune d'origine des apprenants</option>
+        <option value="etabs">Établissement scolaire d'origine des apprenants</option>
+      </select>
+    </div>
+    <div>
+      <label class="sel">Périmètre <span style="font-weight:400">— divisions retenues</span></label>
+      <div id="sel-div-bassin"></div>
+    </div>
+    <div>
+      <label class="sel">Géolocalisation</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="act sec" id="btn-geo">Compléter via geo.api.gouv.fr</button>
+        <button class="act sec" onclick="document.getElementById('imp-geo').click()">Importer un référentiel CSV</button>
+        <input type="file" id="imp-geo" accept=".csv,.txt" hidden>
+      </div>
+    </div>
+    <div id="geo-etat" class="src" style="margin:0 0 4px auto;max-width:340px;text-align:right"></div>
+  </div>
+
+  <div class="note rgpd" style="margin-bottom:14px">
+    <b>Ce qui sort de votre poste, le cas échéant.</b> Le bouton « Compléter via geo.api.gouv.fr » n'envoie que des
+    <b>numéros de département</b> (ex. <code>35</code>) pour récupérer la liste publique des communes et leurs coordonnées.
+    Aucune donnée d'élève, aucun code commune individuel n'est transmis. Le référentiel obtenu est mis en cache dans ce navigateur.
+  </div>
+
+  <div class="grid kpis" id="kpi-bassin"></div>
+
+  <div class="card">
+    <div id="map-carte"></div>
+    <div class="map-legende">
+      <span class="lg"><span class="dot" style="background:var(--vert)"></span> Marmilhat</span>
+      <span class="lg" id="lg-points"><span class="dot" style="background:var(--s1);opacity:.6"></span> Commune de résidence (taille = effectif)</span>
+      <span class="lg"><span class="dot" style="background:var(--or)"></span> Rayons 25 / 50 km</span>
+      <span class="lg" id="lg-div" style="font-style:italic"></span>
+      <span class="lg" style="margin-left:auto;font-style:italic">Fond de plan sélectionnable en haut à droite de la carte</span>
+    </div>
+    <div id="geo-manque" class="note alerte mt" hidden></div>
+  </div>
+
+  <div class="grid two mt">
+    <div class="card">
+      <h3 id="t-liste">Communes d'origine</h3>
+      <div class="hint" id="hint-communes"></div>
+      <div class="scroll"><table id="tab-communes"><thead></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card">
+      <h3 id="t-deps">Départements d'origine</h3>
+      <div class="hint" id="hint-deps">Calculé sans coordonnées : fonctionne même sans référentiel géographique.</div>
+      <div class="scroll"><table id="tab-deps"><thead><tr><th>Département</th><th class="num">Élèves</th><th class="num">Part</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="card mt" id="bloc-communes">
+    <h3>Éloignement et régime</h3>
+    <div class="hint">Croisement distance domicile–établissement × régime d'hébergement : mesure le rayon réel que l'internat permet d'atteindre.</div>
+    <div class="chart-wrap" id="w-dist"><canvas id="ch-dist"></canvas></div>
+  </div>
+
+  <div class="grid two mt" id="bloc-etabs" hidden>
+    <div class="card">
+      <h3>Établissements d'origine (N‑1)</h3>
+      <div class="hint">Les 15 premiers, établissement d'accueil exclu.</div>
+      <div class="chart-wrap" id="w-etab"><canvas id="ch-etab"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Niveau d'origine (MEF N‑1)</h3>
+      <div class="hint">Classe suivie l'année précédente, telle que saisie dans FRÉGATA.</div>
+      <div class="chart-wrap" id="w-mef"><canvas id="ch-mef"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card mt">
+    <h3>Principaux flux : d'où vers quoi</h3>
+    <div class="hint">Niveau d'origine → formation d'accueil, trié par volume. Les flux internes sont signalés.</div>
+    <div class="scroll">
+      <table id="tab-flux"><thead><tr><th>Niveau d'origine</th><th>Établissement d'origine</th><th>Formation d'accueil</th><th class="num">Élèves</th><th>Type</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <div class="card mt">
+    <h3>Recrutement interne par division</h3>
+    <div class="hint">Part des inscrits déjà présents dans l'établissement l'an dernier. Une division à 0 % se recrute intégralement à l'extérieur.</div>
+    <div class="scroll">
+      <table id="tab-interne"><thead><tr><th>Division</th><th>Filière</th><th class="num">Effectif</th><th class="num">Dont internes</th><th class="num">Part</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+</section>
+
+<section id="profil" class="tab">
+  <h2 class="section">Profil des inscrits</h2>
+  <p class="chapo">Toutes les répartitions sont agrégées. Aucune ligne nominative n'est affichée dans cet onglet.
+     Les filtres ci-dessous s'ajoutent à ceux de la vue d'ensemble.</p>
+  <div class="barre-filtres">
+    <div style="flex:1">
+      <label class="sel">Divisions <span style="font-weight:400">— même sélection que les autres onglets</span></label>
+      <div id="sel-div-profil"></div>
+    </div>
+  </div>
+  <div class="grid kpis" id="kpi-profil"></div>
+  <div class="grid three">
+    <div class="card"><h3>Régime d'hébergement</h3><div class="chart-wrap" id="w-regime"><canvas id="ch-regime"></canvas></div></div>
+    <div class="card"><h3>Âge au 31 décembre</h3><div class="chart-wrap" id="w-age"><canvas id="ch-age"></canvas></div></div>
+    <div class="card"><h3 id="titre-sexe">Sexe par cycle</h3><div class="chart-wrap" id="w-sexe"><canvas id="ch-sexe"></canvas></div></div>
+  </div>
+  <div class="grid two mt">
+    <div class="card">
+      <h3>Catégorie socio‑professionnelle du responsable 1</h3>
+      <div class="hint">Groupe socio‑professionnel agrégé — utile pour situer l'établissement face à son IPS.</div>
+      <div class="chart-wrap" id="w-csp"><canvas id="ch-csp"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Langues, options et sections</h3>
+      <div class="hint">LV2, enseignements facultatifs et section européenne, par nombre d'inscrits.</div>
+      <div class="scroll">
+        <table id="tab-options"><thead><tr><th>Élément</th><th>Catégorie</th><th class="num">Élèves</th><th class="num">Part</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= COMPARAISON ======================= -->
+<section id="compare" class="tab">
+  <h2 class="section">Évolution pluriannuelle</h2>
+  <p class="chapo">Chargez autant d'exports FRÉGATA que vous avez de rentrées : l'outil les classe par année
+     et construit les séries. Les filtres de périmètre s'appliquent à chaque millésime, ce qui permet de suivre
+     une division ou une filière année après année. Tout reste dans ce navigateur : rien n'est conservé
+     à la fermeture de l'onglet.</p>
+
+  <div class="depot" id="depot-serie">
+    <div class="gros">Déposez ici vos exports, une rentrée par fichier</div>
+    <div class="pt">Sélection multiple possible — l'année de rentrée est déduite de chaque fichier</div>
+    <button class="act" onclick="document.getElementById('imp-serie').click()">Ajouter des exports</button>
+    <input type="file" id="imp-serie" accept=".txt,.csv,.tsv,.htm,.html,.xls" multiple hidden>
+    <div id="msg-serie" class="src"></div>
+  </div>
+
+  <div class="card mt">
+    <h3>Millésimes chargés</h3>
+    <div class="hint" id="hint-serie"></div>
+    <div class="scroll"><table id="tab-serie"><thead><tr><th>Rentrée</th><th>Fichier</th><th class="num">Lignes</th><th class="num">Effectif retenu</th><th class="num">Divisions</th><th></th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <div id="evolution-contenu" hidden>
+    <div class="grid kpis mt" id="kpi-evol"></div>
+
+    <div class="card mt">
+      <h3>Effectif par rentrée</h3>
+      <div class="hint" id="hint-evol-total"></div>
+      <div class="chart-wrap" id="w-evol"><canvas id="ch-evol"></canvas></div>
+    </div>
+
+    <div class="card mt">
+      <h3 id="titre-multiples">Évolution par filière</h3>
+      <div class="hint">Une courbe par filière, toutes à la même échelle : ce qui décroche se voit d'un coup d'œil.
+        Cocher des divisions dans un autre onglet bascule cette grille au niveau des divisions.</div>
+      <div id="petits-multiples" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr));margin-top:12px"></div>
+    </div>
+
+    <div class="card mt">
+      <h3>Indicateurs par rentrée</h3>
+      <div class="hint">Mêmes définitions que dans les autres onglets, appliquées à chaque millésime.</div>
+      <div class="scroll"><table id="tab-evol-ind"><thead></thead><tbody></tbody></table></div>
+    </div>
+
+    <div class="grid two mt">
+      <div class="card">
+        <h3>Effectif par division</h3>
+        <div class="scroll"><table id="tab-evol-div"><thead></thead><tbody></tbody></table></div>
+      </div>
+      <div class="card">
+        <h3>Établissements d'origine</h3>
+        <div class="hint">Les 20 premiers sur l'ensemble de la période.</div>
+        <div class="scroll"><table id="tab-evol-etab"><thead></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= DONNEES & QUALITE ======================= -->
+<section id="donnees" class="tab">
+  <h2 class="section">Import &amp; fiabilité</h2>
+  <p class="chapo">La porte d'entrée de l'outil, et la réponse à une question qu'on se pose avant de présenter
+     un chiffre en réunion : <b>sur combien d'élèves cette analyse porte-t-elle réellement ?</b>
+     Un export incomplet ne fait pas planter le tableau de bord — il rétrécit silencieusement ses bases.</p>
+
+  <div class="depot" id="depot">
+    <div class="gros">Déposez ici l'export FRÉGATA</div>
+    <div class="pt">Texte tabulé, point-virgule ou virgule, ou tableau HTML — encodage UTF‑8, Windows‑1252 ou UTF‑16, détecté automatiquement</div>
+    <button class="act" onclick="document.getElementById('imp-a').click()">Choisir un fichier</button>
+    <input type="file" id="imp-a" accept=".txt,.csv,.tsv,.htm,.html,.xls" hidden>
+    <div id="msg-import" class="src"></div>
+    <div id="reglages-lecture" style="margin-top:14px;padding-top:12px;border-top:1px solid #e6ede9;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;justify-content:center" hidden>
+      <div style="text-align:left">
+        <label class="sel" for="f-sep">Séparateur</label>
+        <select id="f-sep" style="min-width:180px">
+          <option value="">Détection automatique</option>
+          <option value="\t">Tabulation</option>
+          <option value=";">Point-virgule</option>
+          <option value=",">Virgule</option>
+          <option value="|">Barre verticale</option>
+        </select>
+      </div>
+      <div style="text-align:left">
+        <label class="sel" for="f-entete">Ligne d'en-tête</label>
+        <select id="f-entete" style="min-width:180px">
+          <option value="">Détection automatique</option>
+          <option value="0">Ligne 1</option><option value="1">Ligne 2</option>
+          <option value="2">Ligne 3</option><option value="3">Ligne 4</option>
+          <option value="4">Ligne 5</option><option value="5">Ligne 6</option>
+        </select>
+      </div>
+      <button class="act sec" id="btn-relire">Relire le fichier</button>
+    </div>
+  </div>
+
+  <div class="note rgpd mt">
+    <b>Ce que l'outil lit, et ce qu'il refuse de lire.</b> Le fichier est analysé dans la page, en mémoire vive, et n'est envoyé
+    nulle part. Les colonnes sensibles — <b>IBAN, BIC, banque, INE, INA, RNIE, identifiants SIÈCLE, téléphones, courriels,
+    adresses postales détaillées</b> — ne sont même pas recopiées en mémoire : elles sont écartées à la lecture de l'en‑tête.
+    Les noms ne servent qu'à la détection de doublons et restent masqués par défaut. Fermer l'onglet efface tout.
+  </div>
+
+  <details id="diagnostic" class="card mt" hidden>
+    <summary>Diagnostic de lecture <span style="font-weight:400;color:var(--gris)">— comment le fichier a été interprété</span></summary>
+    <div class="hint mt">À transmettre tel quel si la lecture échoue : il ne contient que des noms de colonnes,
+      aucune donnée d'élève.</div>
+    <div id="diagnostic-corps" class="mt"></div>
+  </details>
+
+  <div id="etab-ref" class="card mt" hidden>
+    <h3>Établissement de référence</h3>
+    <div class="hint">Identifié dans l'export, jamais codé en dur : l'outil fonctionne sur la base FRÉGATA
+      de n'importe quel établissement. C'est lui qui sert de point d'origine aux distances et de repère
+      pour distinguer recrutement interne et externe.</div>
+    <div id="etab-ref-corps"></div>
+  </div>
+
+  <div id="qualite" hidden>
+    <div class="card mt">
+      <h3>Ce que l'export permet — et ce qu'il ne permet pas</h3>
+      <div class="hint">Chaque analyse repose sur des colonnes précises. Quand elles sont vides, l'analyse
+        correspondante porte sur moins d'élèves qu'annoncé : c'est ce que mesure ce bloc.</div>
+      <div id="fiabilite"></div>
+      <details class="mt">
+        <summary>Les contrôles ligne à ligne</summary>
+        <div id="liste-anomalies" class="mt"></div>
+      </details>
+    </div>
+
+    <div class="card mt">
+      <h3>Exporter les tableaux agrégés</h3>
+      <div class="hint">Fichiers CSV sans aucune donnée nominative — pour un rapport, un CA ou un dialogue de gestion.
+        Ils suivent le périmètre coché.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="act sec" onclick="exportCSV('divisions')">Effectifs par division</button>
+        <button class="act sec" onclick="exportCSV('communes')">Communes d'origine</button>
+        <button class="act sec" onclick="exportCSV('departements')">Départements d'origine</button>
+        <button class="act sec" onclick="exportCSV('etablissements')">Établissements d'origine</button>
+        <button class="act sec" onclick="exportCSV('profil')">Profil (sexe, régime, âge, CSP)</button>
+      </div>
+      <div class="hint mt" style="margin-bottom:4px">Réglages — seuils, position de l'établissement, référentiel géographique.
+        Aucune donnée d'élève : ce fichier se partage entre collègues et se recharge d'un poste à l'autre.
+        <span id="msg-reglages-onglet"></span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="act sec" onclick="exporterReglages()">Exporter les réglages (JSON)</button>
+        <button class="act sec" onclick="document.getElementById('imp-reglages').click()">Importer des réglages</button>
+        <input type="file" id="imp-reglages" accept=".json" hidden>
+        <button class="act sec" onclick="retourAccueil()">Revenir à l'écran de démarrage</button>
+      </div>
+    </div>
+
+    <details class="card mt">
+      <summary>Doublons potentiels <span id="cnt-doublons" style="font-weight:400;color:var(--gris)"></span></summary>
+      <div class="hint mt">Même nom, prénom et date de naissance sur plusieurs lignes.
+        <label style="font-weight:400"><input type="checkbox" id="chk-noms"> afficher les noms</label>
+      </div>
+      <div class="scroll"><table id="tab-doublons"><thead><tr><th>Identité</th><th class="num">Lignes</th><th>Divisions</th></tr></thead><tbody></tbody></table></div>
+    </details>
+
+    <details class="card mt">
+      <summary>Reconnaissance des colonnes <span id="hint-cols" style="font-weight:400;color:var(--gris)"></span></summary>
+      <div id="cols-rapport" class="mt"></div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<script>
+"use strict";
+
+/* =========================================================
+   1. PARAMÈTRES ÉTABLISSEMENT
+   ========================================================= */
+/* L'établissement de référence n'est pas codé en dur : il est déduit de l'export
+   (colonnes « UAI administrative », « UAI opérationnelle », « UAI code RNE »).
+   L'outil fonctionne donc sur la base FRÉGATA de n'importe quel établissement. */
+let ETAB = {nom:"—", uai:null, dep:null, libDep:null, region:null,
+            commune:null, lat:null, lon:null, source:"non déterminée"};
+const CLE_ETAB = "tdb-recrutement-etab-v1";
+const PAL = {s1:"#2a78d6", s2:"#eb6834", s3:"#1baf7a"};
+
+/* Référentiel géographique minimal embarqué (bassin proche), clé = nom normalisé.
+   Tout le reste est complété via geo.api.gouv.fr ou un CSV importé — aucune coordonnée inventée. */
+const GEO_EMBARQUE = {
+  "clermont ferrand":[45.7772,3.0870], "cournon d auvergne":[45.7442,3.1960],
+  "lempdes":[45.7750,3.1900], "pont du chateau":[45.7990,3.2460],
+  "riom":[45.8940,3.1130], "issoire":[45.5440,3.2490], "billom":[45.7200,3.3400],
+  "vertaizon":[45.7660,3.2870], "thiers":[45.8560,3.5480], "aubiere":[45.7520,3.1130],
+  "ennezat":[45.8930,3.2260], "vic le comte":[45.6470,3.2260], "gerzat":[45.8300,3.1440],
+  "volvic":[45.8720,3.0500], "maringues":[45.9230,3.3340], "ambert":[45.5500,3.7420],
+  "brioude":[45.2950,3.3840], "saint flour":[45.0350,3.0900], "beaumont":[45.7570,3.0880]
+};
+
+/* =========================================================
+   2. OUTILS DE BASE
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function norm(s){
+  return (s||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+}
+function pct(n,d){ return d? Math.round(n/d*1000)/10 : 0; }
+function fmtPct(n,d){ return d? pct(n,d).toString().replace(".",",")+" %" : "—"; }
+function distKm(la,lo){
+  if(la==null||lo==null||ETAB.lat==null||ETAB.lon==null) return null;
+  const R=6371, dLa=(la-ETAB.lat)*Math.PI/180, dLo=(lo-ETAB.lon)*Math.PI/180;
+  const a=Math.sin(dLa/2)**2+Math.cos(ETAB.lat*Math.PI/180)*Math.cos(la*Math.PI/180)*Math.sin(dLo/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function compte(arr, fn){
+  const m = new Map();
+  arr.forEach(x=>{ const k=fn(x); if(k==null||k==="") return; m.set(k,(m.get(k)||0)+1); });
+  return Array.from(m, ([k,v])=>({k,v})).sort((a,b)=>b.v-a.v||a.k.localeCompare(b.k,"fr"));
+}
+
+/* =========================================================
+   3. LECTURE DU FICHIER : encodage, séparateur, découpage
+   ========================================================= */
+/* Détection de format et d'encodage.
+   Piège principal : un fichier UTF-16 se décode « sans erreur » en UTF-8 (les octets nuls sont
+   valides) et donne « C\0i\0v\0i\0l\0i\0t\0é » — plus aucun nom de colonne n'est reconnaissable.
+   On inspecte donc les premiers octets avant de décoder quoi que ce soit. */
+function hex(buf, n){
+  return Array.from(new Uint8Array(buf.slice(0, n))).map(b=>b.toString(16).padStart(2,"0")).join(" ");
+}
+function decoder(buf){
+  const o = new Uint8Array(buf);
+  const apercuHex = hex(buf, 16);
+
+  // Formats binaires que l'outil ne sait pas lire : on le dit clairement plutôt que de produire du charabia.
+  if(o[0]===0x50 && o[1]===0x4b) throw Object.assign(new Error(
+    "Ce fichier est un classeur Excel (.xlsx) renommé. Ouvrez-le dans Excel ou LibreOffice puis " +
+    "« Enregistrer sous » → CSV (séparateur point-virgule) ou Texte (séparateur tabulation)."),
+    {diag:{apercuHex, format:"classeur Excel (.xlsx / zip)"}});
+  if(o[0]===0xd0 && o[1]===0xcf) throw Object.assign(new Error(
+    "Ce fichier est un classeur Excel ancien format (.xls). Réenregistrez-le en CSV ou en texte tabulé."),
+    {diag:{apercuHex, format:"classeur Excel (.xls)"}});
+  if(o[0]===0x25 && o[1]===0x50 && o[2]===0x44 && o[3]===0x46) throw Object.assign(new Error(
+    "Ce fichier est un PDF. L'outil attend l'export texte de FRÉGATA, pas son impression."),
+    {diag:{apercuHex, format:"PDF"}});
+
+  // UTF-16 : par marque d'ordre des octets, sinon par densité d'octets nuls.
+  let encodage = null;
+  if(o[0]===0xff && o[1]===0xfe) encodage = "utf-16le";
+  else if(o[0]===0xfe && o[1]===0xff) encodage = "utf-16be";
+  else {
+    const n = Math.min(o.length, 4096);
+    let nulPairs = 0, nulImpairs = 0;
+    for(let i=0;i<n;i++){ if(o[i]===0){ if(i%2) nulImpairs++; else nulPairs++; } }
+    if(nulImpairs > n*0.2 && nulPairs < n*0.02) encodage = "utf-16le";
+    else if(nulPairs > n*0.2 && nulImpairs < n*0.02) encodage = "utf-16be";
+  }
+  if(encodage){
+    const t = new TextDecoder(encodage).decode(buf).replace(/^\uFEFF/,"");
+    return {texte:t, encodage: encodage==="utf-16le" ? "UTF-16 LE" : "UTF-16 BE", apercuHex};
+  }
+
+  try{
+    const t = new TextDecoder("utf-8",{fatal:true}).decode(buf);
+    return {texte:t.replace(/^\uFEFF/,""), encodage:"UTF-8", apercuHex};
+  }catch(e){
+    const t = new TextDecoder("windows-1252").decode(buf);
+    return {texte:t.replace(/^\uFEFF/,""), encodage:"Windows-1252", apercuHex};
+  }
+}
+
+/* Certaines sorties de reporting sont des tableaux HTML portant une extension .csv ou .xls. */
+function extraireTableauHTML(texte){
+  if(!/<t(able|r)[\s>]/i.test(texte)) return null;
+  let doc;
+  try{ doc = new DOMParser().parseFromString(texte, "text/html"); }catch(e){ return null; }
+  const tables = Array.from(doc.querySelectorAll("table"));
+  if(!tables.length) return null;
+  let best = tables[0], n = -1;
+  tables.forEach(t=>{ const k = t.querySelectorAll("td,th").length; if(k>n){ n=k; best=t; } });
+  const lignes = Array.from(best.querySelectorAll("tr")).map(tr=>
+    Array.from(tr.querySelectorAll("td,th")).map(c=>c.textContent.replace(/\u00a0/g," ").trim()));
+  return lignes.filter(l=>l.length).length ? lignes : null;
+}
+
+/* Appariement des en-têtes : tolérant aux espaces, à la ponctuation et aux accents.
+   « C.Postal », « C. Postal » et « CPOSTAL » désignent la même colonne. */
+let _alias = null, _aliasCompact = null;
+function indexAlias(){
+  if(!_alias){
+    _alias = new Set(); _aliasCompact = new Set();
+    Object.values(CHAMPS_DECL).flat().forEach(a=>{ _alias.add(a); _aliasCompact.add(a.replace(/ /g,"")); });
+  }
+  return {plein:_alias, compact:_aliasCompact};
+}
+function cleEntete(h){ return norm(h); }
+function cleCompacte(h){ return norm(h).replace(/ /g,""); }
+const NOM_SEP = {"\t":"tabulation", ";":"point-virgule", ",":"virgule", "|":"barre verticale"};
+function scorerEntete(cellules){
+  const idx = indexAlias(), vus = new Set();
+  cellules.forEach(c=>{
+    const k = cleEntete(c), kc = cleCompacte(c);
+    if(kc && (idx.plein.has(k) || idx.compact.has(kc))) vus.add(kc);
+  });
+  return vus.size;
+}
+
+/* Choix du séparateur et de la ligne d'en-tête.
+   On ne compte pas les colonnes (une ligne « sep=; » ou un titre en tête de fichier fausseraient
+   ce comptage) : on retient la combinaison qui reconnaît le plus de colonnes FRÉGATA.
+   forceSep / forceIdx permettent de passer outre depuis l'interface. */
+function analyser(texte, forceSep, forceIdx){
+  const htm = extraireTableauHTML(texte);
+  if(htm){
+    let idx = forceIdx!=null ? forceIdx : 0, meilleur = -1;
+    if(forceIdx==null) htm.slice(0,20).forEach((r,i)=>{ const sc=scorerEntete(r); if(sc>meilleur){meilleur=sc; idx=i;} });
+    return {lignes:htm, sep:null, sepNom:"tableau HTML", idx, score:scorerEntete(htm[idx]||[])};
+  }
+  const seps = forceSep ? [forceSep] : ["\t",";",",","|"];
+  const prefixe = texte.slice(0, 200000);
+  let best = {sep:seps[0], idx:0, score:-1, cols:0};
+  seps.forEach(sep=>{
+    const rows = decouper(prefixe, sep);
+    if(forceIdx!=null){
+      const r = rows[forceIdx] || [];
+      const sc = scorerEntete(r);
+      if(sc > best.score || (sc === best.score && r.length > best.cols))
+        best = {sep, idx:forceIdx, score:sc, cols:r.length};
+    } else {
+      rows.slice(0,20).forEach((r,i)=>{
+        const sc = scorerEntete(r);
+        if(sc > best.score || (sc === best.score && r.length > best.cols))
+          best = {sep, idx:i, score:sc, cols:r.length};
+      });
+    }
+  });
+  return {lignes: decouper(texte, best.sep), sep:best.sep, sepNom:NOM_SEP[best.sep]||best.sep,
+          idx:best.idx, score:best.score};
+}
+function detecterSep(ligne){
+  const cand = ["\t",";",","];
+  let best="\t", n=-1;
+  cand.forEach(c=>{ const k=ligne.split(c).length; if(k>n){n=k;best=c;} });
+  return best;
+}
+
+/* Découpage tolérant aux guillemets (FRÉGATA n'en met pas, mais Excel peut en ajouter). */
+function decouper(texte, sep){
+  const lignes=[]; let champ="", ligne=[], q=false;
+  for(let i=0;i<texte.length;i++){
+    const c=texte[i];
+    if(q){
+      if(c==='"'){ if(texte[i+1]==='"'){champ+='"';i++;} else q=false; }
+      else champ+=c;
+    }else{
+      if(c==='"') q=true;
+      else if(c===sep){ ligne.push(champ); champ=""; }
+      else if(c==="\n"){ ligne.push(champ); lignes.push(ligne); ligne=[]; champ=""; }
+      else if(c==="\r"){ /* ignoré */ }
+      else champ+=c;
+    }
+  }
+  if(champ!==""||ligne.length){ ligne.push(champ); lignes.push(ligne); }
+  return lignes.filter(l=>l.length>1 || (l.length===1 && l[0].trim()!==""));
+}
+
+/* =========================================================
+   4. CARTOGRAPHIE DES COLONNES FRÉGATA
+   Liste blanche stricte : tout ce qui n'est pas listé ici n'entre jamais en mémoire.
+   ========================================================= */
+const CHAMPS_DECL = {
+  civilite:      ["civilite"],
+  nom:           ["nom"],
+  prenom:        ["prenom"],
+  sexe:          ["sexe"],
+  dateNaiss:     ["date naiss"],
+  paysNaiss:     ["pays naiss"],
+  depNaiss:      ["dep naiss"],
+  groupeNation:  ["groupe nation"],
+  boursier:      ["boursier luciole","boursier"],
+  etat:          ["etat"],
+  situaFam:      ["situa fam"],
+  ligne6:        ["ligne 6 adr"],
+  cp:            ["c postal","code postal"],
+  inseeCom:      ["insee com adr"],
+  statut:        ["statut"],
+  resp1Lien:     ["resp leg1 lien resp"],
+  resp1CSP:      ["resp leg1 csp"],
+  resp1Grp:      ["resp leg1 groupe sp"],
+  resp1Pro:      ["resp leg1 situa pro"],
+  resp1Fam:      ["resp leg1 situa fam"],
+  resp1CP:       ["resp leg1 cp"],
+  resp2Lien:     ["resp leg2 lien resp"],
+  resp2CSP:      ["resp leg2 csp"],
+  resp2Grp:      ["resp leg2 groupe sp"],
+  resp2Pro:      ["resp leg2 situa pro"],
+  sectionAdmin:  ["section admin"],
+  libClassAdmin: ["libelle class admin"],
+  sectionRef:    ["section ref"],
+  formation:     ["formation"],
+  codeDivision:  ["code division"],
+  libDivision:   ["libelle division"],
+  dEntreeForm:   ["date entree formation"],
+  dSortieForm:   ["date sortie formation"],
+  dEntreeEtab:   ["date entree etab"],
+  dSortieEtab:   ["date sortie etab"],
+  motifSortie:   ["motif de sortie"],
+  sortiePrem:    ["sortie prematuree"],
+  redoublant:    ["redoublant"],
+  preApprenti:   ["pre apprenti"],
+  uaiAdmin:      ["uai administrative"],
+  uaiOp:         ["uai operationnelle"],
+  uaiRNE:        ["uai code rne"],
+  uaiCodeDep:    ["uai code departement"],
+  uaiLibDep:     ["uai lib departement"],
+  uaiLibRegion:  ["uai libelle region"],
+  regime:        ["regime courant"],
+  lv1:           ["lv1"],
+  lv2:           ["lv2"],
+  typeLV2:       ["type d enseign lv2"],
+  diplomeCourt:  ["lib court diplome eleve"],
+  anDiplome:     ["an obten diplome eleve"],
+  antPrecAnnee:  ["anter prec annee sco"],
+  antPrecEtab:   ["anter prec etab"],
+  antPrecMEF:    ["anter prec mef"],
+  dernierEtabEA: ["dernier etab ea"],
+  antN1Statut:   ["anter n 1 statut app"],
+  antN1Etab:     ["anter n 1 etab"],
+  antN1CP:       ["anter n 1 cp com etab"],
+  antN1Pays:     ["anter n 1 pays etab"],
+  antN1MEF:      ["anter n 1 mef"],
+  optionsFac:    ["liste enseign facultatifs"],
+  selo:          ["selo"]
+};
+const CHAMPS = CHAMPS_DECL;
+const CHAMPS_ESSENTIELS = ["nom","prenom","sexe","dateNaiss","cp","formation","codeDivision","libDivision","regime","antN1Etab","antN1MEF"];
+const LIB_COL = {
+  civilite:"Civilité", nom:"Nom", prenom:"Prénom", sexe:"Sexe", dateNaiss:"Date naiss.",
+  paysNaiss:"Pays naiss.", depNaiss:"Dép.naiss.", groupeNation:"Groupe nation.",
+  boursier:"Boursier Luciole", etat:"Etat", situaFam:"Situa.fam.", ligne6:"Ligne 6 adr.",
+  cp:"C.Postal", inseeCom:"INSEE com.adr.", statut:"Statut",
+  resp1Lien:"Resp.Lég1 : lien resp.", resp1CSP:"Resp.Lég1 : CSP", resp1Grp:"Resp.Lég1 : groupe SP",
+  resp1Pro:"Resp.Lég1 : situa. pro.", resp1Fam:"Resp.Lég1 : situa. fam.", resp1CP:"Resp.Lég1 : CP",
+  resp2Lien:"Resp.Lég2 : lien resp.", resp2CSP:"Resp.Lég2 : CSP", resp2Grp:"Resp.Lég2 : groupe SP",
+  resp2Pro:"Resp.Lég2 : situa. pro.",
+  sectionAdmin:"Section admin.", libClassAdmin:"Libellé class.admin", sectionRef:"Section réf.",
+  formation:"Formation", codeDivision:"Code division", libDivision:"Libellé division",
+  dEntreeForm:"Date entrée formation", dSortieForm:"Date sortie formation",
+  dEntreeEtab:"Date entrée étab.", dSortieEtab:"Date sortie étab.", motifSortie:"Motif de sortie",
+  sortiePrem:"Sortie prématurée ?", redoublant:"Redoublant ?", preApprenti:"Pré-apprenti ?",
+  uaiAdmin:"UAI administrative", uaiOp:"UAI opérationnelle", uaiRNE:"UAI code RNE",
+  uaiCodeDep:"UAI code département", uaiLibDep:"UAI lib. Département", uaiLibRegion:"UAI libellé région",
+  regime:"Régime courant",
+  lv1:"LV1", lv2:"LV2", typeLV2:"Type d'enseign. LV2",
+  diplomeCourt:"Lib.court diplôme élevé", anDiplome:"An.obten. diplôme élevé",
+  antPrecAnnee:"Antér.préc. : année sco.", antPrecEtab:"Antér.préc. : étab.", antPrecMEF:"Antér.préc. : MEF",
+  dernierEtabEA:"Dernier étab. EA", antN1Statut:"Antér.N-1 : statut app", antN1Etab:"Antér.N-1 : étab.",
+  antN1CP:"Antér.N-1 : CP com.étab.", antN1Pays:"Antér.N-1 : pays étab.", antN1MEF:"Antér.N-1 : MEF",
+  optionsFac:"Liste Enseign.Facultatifs", selo:"SELO"
+};
+
+/* =========================================================
+   5. CLASSIFICATIONS MÉTIER
+   ========================================================= */
+function cycleDe(r){
+  const h = norm([r.formation, r.libDivision, r.sectionAdmin, r.codeDivision].join(" "));
+  if(/(^| )3(e|eme) |classe de 3|cycle orientation|4(e|eme)/.test(h+" ")) return "3ᵉ EA";
+  if(/cpge|bcpst|agro veto/.test(h)) return "CPGE";
+  if(/btsa|bts /.test(h)) return "BTSA";
+  if(/licence/.test(h)) return "Licence pro";
+  if(/ cap |^cap | capa/.test(" "+h+" ")) return "CAP agricole";
+  if(/seconde generale|2nde gt|2gt|seconde g t/.test(h)) return "2de GT";
+  if(/stav|techno/.test(h)) return "Bac techno STAV";
+  if(/bac pro|2nde pro|seconde pro|cgea|njpf|amenagement|horticole|conseil vente|bio industrie/.test(h)) return "Bac pro";
+  if(/bac general|generale/.test(h)) return "Bac général";
+  return "Autre";
+}
+function troncDe(r){
+  const h = norm([r.formation, r.libDivision, r.sectionAdmin, r.codeDivision].join(" "));
+  if(/(^| )3(e|eme) |classe de 3|cycle orientation/.test(h+" ")) return "Collège (3ᵉ EA)";
+  if(/paysag|horticol|jardin|fleurist|njpf|conseil vente|amenagement/.test(h)) return "Tronc végétal";
+  if(/cgea|acse|anabiotec|stav|elevage|grandes cultures|production|agricole|bio industrie|pe gc|agro veto post/.test(h)) return "Tronc agricole";
+  if(/bcpst|seconde generale|2nde gt|2gt|bac general|generale/.test(h)) return "Tronc général";
+  return "Non classé";
+}
+const ORDRE_CYCLES = ["3ᵉ EA","2de GT","Bac général","Bac techno STAV","Bac pro","CAP agricole","BTSA","CPGE","Licence pro","Autre"];
+function rangCycle(c){ const i = ORDRE_CYCLES.indexOf(c); return i<0 ? 99 : i; }
+/* Seuils de dédoublement : 19 / 27 / 32, identiques pour tous les cycles.
+   Valeur de départ seulement — chaque division reste modifiable individuellement
+   dans l'onglet « Divisions & seuils », et la saisie est conservée dans ce navigateur. */
+let SEUILS_DEFAUT = [19, 27, 32];
+const CLE_SEUILS_GLOB = "tdb-recrutement-seuils-generaux-v1";
+function seuilsDe(division){ return SEUILS[division] || SEUILS_DEFAUT.slice(); }
+
+function anneeDe(d){
+  if(!d) return null;
+  let m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})/); if(m) return +m[3];
+  m = d.match(/^(\d{4})-/); if(m) return +m[1];
+  return null;
+}
+function dateDe(d){
+  if(!d) return null;
+  const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
+  const i = d.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(i) return new Date(+i[1], +i[2]-1, +i[3]);
+  return null;
+}
+function depDe(r){
+  const src = (r.cp||"").trim() || (r.inseeCom||"").trim();
+  if(!src) return null;
+  if(/^9[78]\d/.test(src)) return src.slice(0,3);
+  if(/^2[ab]/i.test(src)) return src.slice(0,2).toUpperCase();
+  const d = src.slice(0,2);
+  return /^\d{2}$/.test(d) ? d : null;
+}
+function communeDe(r){
+  // "63370 LEMPDES" -> "LEMPDES" ; sinon rien (on n'invente pas de nom).
+  const l = (r.ligne6||"").trim();
+  const m = l.match(/^\s*\d{5}\s+(.+)$/);
+  if(m) return m[1].trim().replace(/\s+/g," ").toUpperCase();
+  return null;
+}
+/* « 35651 LE RHEU CEDEX » -> code postal 35651, commune LE RHEU (le CEDEX n'est pas un nom de commune). */
+function etabCP(v){
+  const m = (v||"").trim().match(/^(\d{5})\b/);
+  return m ? m[1] : null;
+}
+function etabCommune(v){
+  const m = (v||"").trim().match(/^\s*\d{5}\s+(.+)$/);
+  if(!m) return null;
+  return m[1].replace(/\s+CEDEX(\s+\d+)?\s*$/i,"").replace(/\s+/g," ").trim().toUpperCase() || null;
+}
+function etabPropre(s){
+  if(!s) return null;
+  return s.replace(/\s*\(\s*[0-9]{7}[A-Za-z]\s*\)\s*$/,"").replace(/\s+/g," ").trim();
+}
+function uaiDe(s){
+  const m = (s||"").match(/\(([0-9]{7}[A-Za-z])\)/);
+  return m ? m[1].toUpperCase() : null;
+}
+/* « Est-ce notre établissement ? » — par UAI quand il est présent dans le libellé,
+   sinon par comparaison des intitulés normalisés. */
+function estNous(nom){
+  if(!nom || !ETAB.nom || ETAB.nom === "—") return false;
+  const u = uaiDe(nom);
+  if(u && ETAB.uai) return u === ETAB.uai;
+  const a = norm(etabPropre(nom)), b = norm(etabPropre(ETAB.nom));
+  if(!a || !b) return false;
+  return a === b || a.includes(b) || b.includes(a);
+}
+function majInterne(records){
+  records.forEach(r=>{ r._interne = estNous(r.antN1Etab) || estNous(r.dernierEtabEA); });
+}
+
+/* Valeur la plus fréquente d'une colonne. */
+function modal(records, fn){ const c = compte(records, fn); return c.length ? c[0].k : null; }
+
+/* =========================================================
+   6. CONSTRUCTION DU JEU DE DONNÉES
+   ========================================================= */
+function construire(texte, nomFichier, encodage, apercuHex, forceSep, forceIdx){
+  const info = analyser(texte, forceSep, forceIdx);
+  const lignes = info.lignes;
+  const entetes = (lignes[info.idx]||[]).map(h=>h.replace(/^\uFEFF/,"").trim());
+  const diag = {
+    nomFichier, encodage, apercuHex,
+    separateur: info.sepNom,
+    ligneEntete: info.idx + 1, nbColonnes: entetes.length,
+    nbLignesFichier: lignes.length, colonnesReconnues: info.score,
+    apercuEntetes: entetes.slice(0,14),
+    force: (forceSep || forceIdx!=null) ? "oui" : "non"
+  };
+  if(lignes.length < 2)
+    throw Object.assign(new Error("Le fichier ne contient pas de ligne de données."), {diag});
+  if(info.score < 5 && forceIdx==null)
+    throw Object.assign(new Error(
+      "Aucune ligne d'en-tête FRÉGATA reconnue (" + info.score + " colonne(s) connue(s) trouvée(s)). " +
+      "Si l'en-tête est bien en ligne 1, forcez-le avec les réglages ci-dessous ; " +
+      "sinon vérifiez qu'il s'agit de l'export élèves complet."), {diag});
+
+  const idxNorm = new Map(), idxCompact = new Map();
+  entetes.forEach((h,i)=>{
+    const k = cleEntete(h), kc = cleCompacte(h);
+    if(k && !idxNorm.has(k)) idxNorm.set(k,i);
+    if(kc && !idxCompact.has(kc)) idxCompact.set(kc,i);
+  });
+
+  const mapping = {}, trouves = [], manquants = [];
+  Object.entries(CHAMPS).forEach(([champ, alias])=>{
+    let i;
+    for(const a of alias){
+      if(idxNorm.has(a)){ i = idxNorm.get(a); break; }
+      if(idxCompact.has(a.replace(/ /g,""))){ i = idxCompact.get(a.replace(/ /g,"")); break; }
+    }
+    if(i!==undefined){ mapping[champ]=i; trouves.push(champ); }
+    else manquants.push(champ);
+  });
+  diag.colonnesReconnues = trouves.length;
+  const utilisees = new Set(Object.values(mapping));
+  const ignorees = entetes.filter((h,i)=>!utilisees.has(i));
+
+  if(trouves.length === 0)
+    throw Object.assign(new Error(
+      "La ligne " + (info.idx+1) + " a bien été prise comme en-tête, mais aucun de ses " + entetes.length +
+      " intitulés ne correspond à une colonne FRÉGATA connue."), {diag});
+
+  const records = [];
+  let vides = 0;
+  for(let i=info.idx+1;i<lignes.length;i++){
+    const L = lignes[i];
+    const r = {};
+    for(const [champ, idx] of Object.entries(mapping)){
+      const v = (L[idx]==null?"":L[idx]).trim();   // retire au passage le padding des libellés MEF
+      if(v!=="") r[champ]=v;
+    }
+    if(Object.keys(r).length === 0){ vides++; continue; }   // ligne sans aucune donnée exploitable
+    records.push(r);
+  }
+  diag.lignesVides = vides;
+  diag.lignesRetenues = records.length;
+  if(records.length === 0)
+    throw Object.assign(new Error(
+      "En-tête reconnu (" + trouves.length + " colonnes), mais aucune ligne de données exploitable en dessous."), {diag});
+
+  // Année de rentrée = année la plus fréquente dans "Date entrée formation"
+  const ans = compte(records, r=>anneeDe(r.dEntreeForm));
+  const rentree = ans.length ? +ans[0].k : (new Date()).getFullYear();
+
+  records.forEach(r=>{
+    r._filiere = ((r.formation||"").split("/")[0] || "").trim() || "(filière non renseignée)";
+    r._cycle   = cycleDe(r);
+    r._tronc   = troncDe(r);
+    r._div     = r.codeDivision || r.libDivision || "(division non renseignée)";
+    r._divLib  = r.libDivision || r.codeDivision || "(division non renseignée)";
+    r._dep     = depDe(r);
+    r._commune = communeDe(r);
+    r._sorti   = !!(r.dSortieEtab);
+    r._nouveau = anneeDe(r.dEntreeEtab) === rentree;
+    r._etabOrig= etabPropre(r.antN1Etab);
+    r._mefOrig = (r.antN1MEF||"").replace(/\s+/g," ").trim() || null;
+    r._etabAff = r.uaiAdmin || r.uaiOp || null;
+    r._etabCP  = etabCP(r.antN1CP);
+    r._etabCom = etabCommune(r.antN1CP);
+    const dn = dateDe(r.dateNaiss);
+    r._age = dn ? (rentree - dn.getFullYear()) : null;   // age atteint au 31 decembre de l'annee de rentree
+    r._fille = /^f/i.test(r.sexe||"");
+    r._boursier = /^o/i.test(r.boursier||"");
+    r._heberge = /intern|pension/i.test(r.regime||"");
+  });
+
+  // Établissements d'affectation présents dans l'export (un EPLEFPA multi-centres en compte plusieurs)
+  const etabs = compte(records, r=>r._etabAff).map(e=>({
+    nom: e.k, n: e.v,
+    uai: modal(records.filter(r=>r._etabAff===e.k), r=>r.uaiRNE),
+    dep: modal(records.filter(r=>r._etabAff===e.k), r=>r.uaiCodeDep),
+    libDep: modal(records.filter(r=>r._etabAff===e.k), r=>r.uaiLibDep),
+    region: modal(records.filter(r=>r._etabAff===e.k), r=>r.uaiLibRegion)
+  }));
+  diag.etablissements = etabs.length;
+
+  return {nomFichier, records, rentree, mapping, trouves, manquants, ignorees, diag, etabs,
+          nbColonnes: entetes.length, nbLignes: records.length};
+}
+
+/* =========================================================
+   7. ÉTAT GLOBAL
+   ========================================================= */
+let DS_A = null;
+/* Tous les millésimes chargés, du plus ancien au plus récent. DS_A est celui qui est analysé
+   dans les autres onglets ; il fait partie de la série. */
+let SERIE = [];
+/* Le périmètre d'analyse se choisit par codes division (ensemble vide = toutes)
+   et par régimes (ensemble vide = tous). Un seul jeu de filtres pour tout le tableau de bord :
+   cocher une filière dans un onglet la sélectionne partout. */
+let FILTRES = {etab:"ALL", divisions:new Set(), regimes:new Set(), sorties:"actifs"};
+let SEUILS = {};
+let GEO = {};           // nom normalisé -> [lat,lon]
+let GEO_SOURCE = "embarqué";
+const CLE_SEUILS = "tdb-recrutement-seuils-v1";
+const CLE_GEO    = "tdb-recrutement-geo-v1";
+
+function stockLire(cle){ try{ const v=localStorage.getItem(cle); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function stockEcrire(cle,val){ try{ localStorage.setItem(cle, JSON.stringify(val)); }catch(e){} }
+
+/* Détermine l'établissement de référence et sa position.
+   Position, par ordre de préférence :
+   1. celle que l'utilisateur a saisie (mémorisée par UAI dans ce navigateur) ;
+   2. la commune lue dans l'antériorité des élèves déjà présents l'an dernier
+      (leur établissement N-1, c'est nous — son code postal est donc dans l'export) ;
+   3. rien : les distances et les cercles de rayon sont alors masqués, le reste fonctionne. */
+function definirEtab(ds, nomChoisi){
+  const liste = ds.etabs || [];
+  const e = (nomChoisi && liste.find(x=>x.nom===nomChoisi)) || liste[0] || null;
+  ETAB = {nom: e? e.nom : "—", uai: e? e.uai : null, dep: e? e.dep : null,
+          libDep: e? e.libDep : null, region: e? e.region : null,
+          commune:null, lat:null, lon:null, source:"non déterminée"};
+
+  majInterne(ds.records);   // dépend de ETAB : à refaire à chaque changement
+
+  const sauve = (stockLire(CLE_ETAB) || {})[ETAB.uai || ETAB.nom];
+  if(sauve && isFinite(sauve.lat) && isFinite(sauve.lon)){
+    ETAB.commune = sauve.commune || null; ETAB.lat = sauve.lat; ETAB.lon = sauve.lon;
+    ETAB.source = "position saisie";
+  } else {
+    const internes = ds.records.filter(r=>r._interne && r._etabCom);
+    const com = modal(internes, r=>r._etabCom);
+    const g = com ? GEO[norm(com)] : null;
+    if(com){ ETAB.commune = com; ETAB.source = "déduite de l'antériorité des élèves"; }
+    if(g){ ETAB.lat = g[0]; ETAB.lon = g[1]; }
+    else if(com) ETAB.source = "commune connue (" + com + "), coordonnées à compléter";
+  }
+  majEnteteEtab(ds);
+}
+
+function majEnteteEtab(ds){
+  $("#h-titre").textContent = "Pilotage du recrutement" + (ETAB.nom!=="—" ? " — " + ETAB.nom : "");
+  const bouts = [];
+  if(ETAB.libDep) bouts.push(ETAB.libDep + (ETAB.dep? " ("+ETAB.dep+")" : ""));
+  if(ETAB.region) bouts.push(ETAB.region);
+  if(ETAB.uai) bouts.push("UAI " + ETAB.uai);
+  bouts.push("rentrée " + ds.rentree + "-" + (ds.rentree+1));
+  $("#h-sous").textContent = bouts.join(" · ") || "alimenté par l'export élèves FRÉGATA";
+}
+
+function enregistrerPositionEtab(commune){
+  const g = GEO[norm(commune)];
+  const tout = stockLire(CLE_ETAB) || {};
+  if(!g){ return false; }
+  ETAB.commune = commune.toUpperCase(); ETAB.lat = g[0]; ETAB.lon = g[1]; ETAB.source = "position saisie";
+  tout[ETAB.uai || ETAB.nom] = {commune:ETAB.commune, lat:g[0], lon:g[1]};
+  stockEcrire(CLE_ETAB, tout);
+  return true;
+}
+
+function chargerGeo(){
+  GEO = Object.assign({}, GEO_EMBARQUE);
+  const c = stockLire(CLE_GEO);
+  if(c && typeof c==="object"){ Object.assign(GEO, c); GEO_SOURCE = "embarqué + cache local"; }
+}
+function actifs(ds){
+  if(!ds) return [];
+  let r = ds.records;
+  if(FILTRES.etab !== "ALL") r = r.filter(x=>x._etabAff===FILTRES.etab);
+  if(FILTRES.sorties === "actifs") r = r.filter(x=>!x._sorti);
+  if(FILTRES.divisions.size) r = r.filter(x=>FILTRES.divisions.has(x._div));
+  if(FILTRES.regimes.size)   r = r.filter(x=>FILTRES.regimes.has(x.regime || "(non renseigné)"));
+  return r;
+}
+
+/* Périmètre sans le filtre divisions : sert à construire la liste à cocher, pour que
+   décocher une division ne la fasse pas disparaître de la liste. Les autres filtres
+   s'appliquent, afin que les effectifs affichés dans la liste soient ceux du périmètre. */
+function basePourSelecteur(ds, sauf){
+  if(!ds) return [];
+  let r = ds.records;
+  if(FILTRES.etab !== "ALL") r = r.filter(x=>x._etabAff===FILTRES.etab);
+  if(FILTRES.sorties === "actifs") r = r.filter(x=>!x._sorti);
+  if(sauf !== "divisions" && FILTRES.divisions.size) r = r.filter(x=>FILTRES.divisions.has(x._div));
+  if(sauf !== "regimes" && FILTRES.regimes.size) r = r.filter(x=>FILTRES.regimes.has(x.regime || "(non renseigné)"));
+  return r;
+}
+function libDivision(code){
+  const r = (DS_A ? DS_A.records : []).find(x=>x._div===code);
+  return r && r._divLib && r._divLib !== code ? r._divLib : null;
+}
+function perimetreTexte(){
+  const d = FILTRES.divisions;
+  if(!d.size) return "toutes divisions";
+  if(d.size === 1) return Array.from(d)[0];
+  return d.size + " divisions";
+}
+
+/* =========================================================
+   8. GRAPHIQUES
+   ========================================================= */
+const CHARTS = {};
+const CHART_OK = (typeof Chart !== "undefined");
+const LEAFLET_OK = (typeof L !== "undefined");
+if(CHART_OK){
+  Chart.defaults.font.family = "'Segoe UI',system-ui,-apple-system,sans-serif";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = "#52514e";
+}
+/* Sans reseau, les bibliotheques de graphiques et de carte ne se chargent pas :
+   le tableau de bord continue de fonctionner en mode tableaux. */
+function signalerLibs(){
+  if(CHART_OK && LEAFLET_OK) return;
+  const manque = [];
+  if(!CHART_OK) manque.push("la bibliothèque de graphiques");
+  if(!LEAFLET_OK) manque.push("la bibliothèque de carte");
+  const d = document.createElement("div");
+  d.className = "note alerte";
+  d.style.margin = "0 20px";
+  d.innerHTML = "<b>Mode hors connexion.</b> " + manque.join(" et ") +
+    (manque.length>1 ? " n'ont pas pu être chargées" : " n'a pas pu être chargée") +
+    " depuis Internet. Tous les indicateurs, tableaux et exports restent opérationnels : seules les représentations graphiques sont absentes.";
+  document.querySelector("main").prepend(d);
+}
+function hauteur(wrapId, n, base){
+  const w = document.getElementById(wrapId);
+  if(w) w.style.height = Math.max(base||150, 44 + n*26) + "px";
+}
+function barres(id, wrapId, labels, valeurs, opts){
+  opts = opts||{};
+  if(!CHART_OK) return;
+  if(CHARTS[id]) CHARTS[id].destroy();
+  const el = document.getElementById(id);
+  if(!el) return;
+  hauteur(wrapId, labels.length, opts.hauteurMin);
+  const total = valeurs.reduce((a,b)=>a+b,0);
+  CHARTS[id] = new Chart(el, {
+    type:"bar",
+    data:{labels, datasets:[{label:opts.label||"Élèves", data:valeurs,
+      backgroundColor:opts.couleur||PAL.s1, borderRadius:4, borderSkipped:false, maxBarThickness:20}]},
+    options:{
+      indexAxis:"y", maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>` ${c.parsed.x} élève(s) · ${fmtPct(c.parsed.x,total)}`}}},
+      scales:{x:{beginAtZero:true, grid:{color:"#eef3f0"}, border:{display:false}, ticks:{precision:0}},
+              y:{grid:{display:false}, border:{display:false}, ticks:{autoSkip:false, font:{size:11.5}}}}
+    }
+  });
+}
+function barresGroupees(id, wrapId, labels, series){
+  if(!CHART_OK) return;
+  if(CHARTS[id]) CHARTS[id].destroy();
+  const el = document.getElementById(id);
+  if(!el) return;
+  hauteur(wrapId, labels.length*series.length*0.75, 200);
+  CHARTS[id] = new Chart(el, {
+    type:"bar",
+    data:{labels, datasets:series.map((s,i)=>({label:s.nom, data:s.data,
+      backgroundColor:[PAL.s1,PAL.s2,PAL.s3][i]||PAL.s1, borderRadius:4, borderSkipped:false, maxBarThickness:16}))},
+    options:{indexAxis:"y", maintainAspectRatio:false,
+      plugins:{legend:{position:"top", labels:{boxWidth:12, boxHeight:12, usePointStyle:false}}},
+      scales:{x:{beginAtZero:true, grid:{color:"#eef3f0"}, border:{display:false}, ticks:{precision:0}},
+              y:{grid:{display:false}, border:{display:false}, ticks:{autoSkip:false, font:{size:11.5}}}}}
+  });
+}
+function barresEmpilees(id, wrapId, labels, series){
+  if(!CHART_OK) return;
+  if(CHARTS[id]) CHARTS[id].destroy();
+  const el = document.getElementById(id);
+  if(!el) return;
+  hauteur(wrapId, labels.length, 200);
+  CHARTS[id] = new Chart(el, {
+    type:"bar",
+    data:{labels, datasets:series.map((s,i)=>({label:s.nom, data:s.data,
+      backgroundColor:[PAL.s1,PAL.s2,PAL.s3][i]||PAL.s1, borderRadius:4, borderSkipped:false,
+      maxBarThickness:20, borderColor:"#ffffff", borderWidth:2}))},
+    options:{indexAxis:"y", maintainAspectRatio:false,
+      plugins:{legend:{position:"top", labels:{boxWidth:12, boxHeight:12}}},
+      scales:{x:{stacked:true, beginAtZero:true, grid:{color:"#eef3f0"}, border:{display:false}, ticks:{precision:0}},
+              y:{stacked:true, grid:{display:false}, border:{display:false}, ticks:{autoSkip:false, font:{size:11.5}}}}}
+  });
+}
+function courbe(id, wrapId, labels, valeurs, nom, maxY){
+  if(!CHART_OK) return;
+  if(CHARTS[id]) CHARTS[id].destroy();
+  const el = document.getElementById(id);
+  if(!el) return;
+  const petit = !wrapId;
+  CHARTS[id] = new Chart(el, {
+    type:"line",
+    data:{labels, datasets:[{label:nom||"", data:valeurs, borderColor:PAL.s1,
+      backgroundColor:"rgba(42,120,214,.10)", fill:true, tension:.25,
+      borderWidth:petit?2:2.5, pointRadius:petit?2:4, pointBackgroundColor:PAL.s1}]},
+    options:{maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>` ${c.parsed.y} élève(s)`}}},
+      scales:{
+        x:{grid:{display:false}, border:{display:false}, ticks:{font:{size:petit?9.5:11.5}, maxRotation:0, autoSkip:petit}},
+        y:{beginAtZero:true, suggestedMax:maxY, grid:{color:"#eef3f0"}, border:{display:false},
+           ticks:{precision:0, font:{size:petit?9.5:11.5}, maxTicksLimit:petit?4:6}}}}
+  });
+}
+function kpi(cont, items){
+  cont.innerHTML = items.map(i=>`<div class="kpi ${i.c||''}">
+    <div class="lbl">${i.l}</div><div class="val">${i.v}</div>
+    <div class="delta ${i.dc||''}">${i.d||""}</div></div>`).join("");
+}
+
+/* =========================================================
+   9. RENDU — VUE D'ENSEMBLE
+   ========================================================= */
+/* Liste à cocher des divisions, groupée par filière (la partie du libellé de formation
+   qui précède le « / »). Cocher une filière coche toutes ses divisions d'un coup.
+   Le même composant est affiché dans plusieurs onglets et pilote le même état. */
+function rendreSelecteurDivisions(hostId){
+  const host = document.getElementById(hostId);
+  if(!host) return;
+  const base = basePourSelecteur(DS_A, "divisions");
+  const parFil = new Map();
+  base.forEach(r=>{
+    if(!parFil.has(r._filiere)) parFil.set(r._filiere, new Map());
+    const m = parFil.get(r._filiere);
+    m.set(r._div, (m.get(r._div)||0) + 1);
+  });
+  const fils = Array.from(parFil.keys()).sort((a,b)=>a.localeCompare(b,"fr"));
+  const sel = FILTRES.divisions;
+  const total = base.length;
+  const retenus = sel.size ? base.filter(r=>sel.has(r._div)).length : total;
+
+  let html = `<div class="barre">
+      <b>${sel.size ? sel.size+" division(s) · "+retenus+" élèves" : "toutes les divisions · "+total+" élèves"}</b>
+      <button data-act="tout">Toutes</button>
+    </div>`;
+  fils.forEach(f=>{
+    const m = parFil.get(f);
+    const codes = Array.from(m.keys()).sort((a,b)=>a.localeCompare(b,"fr"));
+    const nFil = codes.reduce((a,c)=>a+m.get(c),0);
+    const toutes = codes.every(c=>sel.has(c));
+    const aucune = codes.every(c=>!sel.has(c));
+    html += `<label class="fil"><input type="checkbox" data-fil="${encodeURIComponent(f)}"
+        ${toutes ? "checked" : ""} ${!toutes && !aucune ? 'data-partiel="1"' : ""}>
+        <span>${f}</span><span class="cnt">${nFil}</span></label>`;
+    codes.forEach(c=>{
+      const lib = libDivision(c);
+      html += `<label class="div"><input type="checkbox" data-div="${encodeURIComponent(c)}" ${sel.has(c)?"checked":""}>
+        <span>${c}${lib? ` <span class="lib">${lib}</span>`:""}</span><span class="cnt">${m.get(c)}</span></label>`;
+    });
+  });
+  host.className = "coche";
+  host.innerHTML = html;
+
+  host.querySelectorAll('input[data-partiel]').forEach(i=>i.indeterminate = true);
+  /* Aucune case cochée = périmètre complet. Cocher une case part donc de zéro
+     et ajoute, plutôt que de retrancher d'un « tout » implicite. */
+  host.querySelectorAll('button[data-act]').forEach(b=>b.onclick = () => {
+    FILTRES.divisions = new Set(); toutRendre();
+  });
+  host.querySelectorAll('input[data-fil]').forEach(i=>i.onchange = e=>{
+    const f = decodeURIComponent(e.target.dataset.fil);
+    const codes = Array.from(parFil.get(f).keys());
+    const s2 = new Set(FILTRES.divisions);
+    if(e.target.checked) codes.forEach(c=>s2.add(c)); else codes.forEach(c=>s2.delete(c));
+    FILTRES.divisions = s2; toutRendre();
+  });
+  host.querySelectorAll('input[data-div]').forEach(i=>i.onchange = e=>{
+    const c = decodeURIComponent(e.target.dataset.div);
+    const s2 = new Set(FILTRES.divisions);
+    if(e.target.checked) s2.add(c); else s2.delete(c);
+    FILTRES.divisions = s2; toutRendre();
+  });
+}
+
+function rendreSelecteurRegimes(hostId){
+  const host = document.getElementById(hostId);
+  if(!host) return;
+  const base = basePourSelecteur(DS_A, "regimes");
+  const rg = compte(base, r=>r.regime || "(non renseigné)");
+  const sel = FILTRES.regimes;
+  host.className = "coche";
+  host.style.minWidth = "230px";
+  host.innerHTML = `<div class="barre"><b>${sel.size? sel.size+" régime(s)" : "tous les régimes"}</b>
+      <button data-act="tout">Tout</button></div>` +
+    rg.map(x=>`<label><input type="checkbox" data-reg="${encodeURIComponent(x.k)}" ${sel.has(x.k)?"checked":""}>
+      <span>${x.k}</span><span class="cnt">${x.v}</span></label>`).join("");
+  host.querySelector('button[data-act]').onclick = () => { FILTRES.regimes = new Set(); toutRendre(); };
+  host.querySelectorAll('input[data-reg]').forEach(i=>i.onchange = e=>{
+    const v = decodeURIComponent(e.target.dataset.reg);
+    const s2 = new Set(FILTRES.regimes);
+    if(e.target.checked) s2.add(v); else s2.delete(v);
+    if(s2.size === rg.length) s2.clear();
+    FILTRES.regimes = s2; toutRendre();
+  });
+}
+
+function rendreFiltres(){
+  const ds = DS_A; if(!ds) return;
+  const multi = (ds.etabs||[]).length > 1;
+  const optEtab = multi ? `<div><label class="sel" for="f-etab">Établissement d'affectation</label>
+      <select id="f-etab" style="min-width:280px">
+        <option value="ALL">Tous les établissements (agrégé)</option>
+        ${ds.etabs.map(e=>`<option value="${e.nom}" ${e.nom===FILTRES.etab?"selected":""}>${e.nom} (${e.n})</option>`).join("")}
+      </select></div>` : "";
+  const optAnnee = SERIE.length > 1 ? `<div><label class="sel" for="f-annee">Rentrée analysée</label>
+      <select id="f-annee" style="min-width:150px">
+        ${SERIE.map(x=>`<option value="${x.rentree}" ${x===DS_A?"selected":""}>${x.rentree}‑${x.rentree+1}</option>`).join("")}
+      </select></div>` : "";
+  $("#filtres").innerHTML = optAnnee + optEtab + `
+    <div><label class="sel">Divisions <span style="font-weight:400">— cocher une filière la sélectionne entièrement</span></label>
+      <div id="sel-div-apercu"></div></div>
+    <div><label class="sel">Régimes <span style="font-weight:400">— cumulables</span></label>
+      <div id="sel-reg-apercu"></div></div>
+    <div><label class="sel" for="f-sorties">Élèves sortis</label>
+      <select id="f-sorties" style="min-width:190px">
+        <option value="actifs" ${FILTRES.sorties==="actifs"?"selected":""}>Exclure les sortis</option>
+        <option value="tous" ${FILTRES.sorties==="tous"?"selected":""}>Inclure les sortis</option>
+      </select>
+      <div style="margin-top:8px"><button class="act sec" onclick="razFiltres()">Réinitialiser</button></div></div>`;
+  if(SERIE.length > 1) $("#f-annee").onchange = e=>{
+    const ds = SERIE.find(x=>x.rentree === +e.target.value);
+    if(ds){ DS_A = ds; definirEtab(DS_A, FILTRES.etab==="ALL"? null : FILTRES.etab); toutRendre(); }
+  };
+  if(multi) $("#f-etab").onchange = e=>{
+    FILTRES.etab = e.target.value;
+    FILTRES.divisions = new Set();
+    definirEtab(DS_A, e.target.value==="ALL" ? null : e.target.value);
+    toutRendre();
+  };
+  $("#f-sorties").onchange = e=>{FILTRES.sorties=e.target.value; toutRendre();};
+  rendreSelecteurDivisions("sel-div-apercu");
+  rendreSelecteurRegimes("sel-reg-apercu");
+}
+function razFiltres(){
+  FILTRES = {etab:"ALL", divisions:new Set(), regimes:new Set(), sorties:"actifs"};
+  definirEtab(DS_A, null); toutRendre();
+}
+
+function rendreApercu(){
+  const R = actifs(DS_A), n = R.length;
+  $("#titre-rentree").textContent = `— rentrée ${DS_A.rentree}‑${DS_A.rentree+1} · ${DS_A.nomFichier}`;
+  const filles = R.filter(r=>r._fille).length;
+  const nouveaux = R.filter(r=>r._nouveau).length;
+  const depEtab = ETAB.dep || null;
+  const dLocal = depEtab ? R.filter(r=>r._dep===depEtab).length : null;
+  const boursiers = R.filter(r=>r._boursier).length;
+  const aBoursier = R.some(r=>r.boursier);
+  kpi($("#kpi-apercu"), [
+    {l:"Effectif", v:n, d:`${new Set(R.map(r=>r._div)).size} division(s)` + (FILTRES.divisions.size? " sélectionnée(s)" : " — tout l'établissement")},
+    {l:"Nouveaux entrants", v:nouveaux, c:"bleu", d:`${fmtPct(nouveaux,n)} de l'effectif`},
+    {l:"Part de filles", v:fmtPct(filles,n), c:"violet", d:`${filles} élèves`},
+    depEtab ? {l:`Résidant dans le ${depEtab}`, v:fmtPct(dLocal,n), c:"orange",
+               d:`${dLocal} élèves${ETAB.libDep? " · "+ETAB.libDep : ""}`}
+            : {l:"Départements d'origine", v:new Set(R.map(r=>r._dep).filter(Boolean)).size, c:"orange", d:"département de l'établissement inconnu"},
+    aBoursier ? {l:"Boursiers", v:fmtPct(boursiers,n), c:"rouge", d:`${boursiers} élèves`} :
+                {l:"Élèves sortis", v:DS_A.records.filter(r=>r._sorti).length, c:"rouge", d:"depuis la rentrée"}
+  ]);
+
+  const c = compte(R, r=>r._cycle).sort((a,b)=>rangCycle(a.k)-rangCycle(b.k));
+  barres("ch-cycle","w-cycle", c.map(x=>x.k), c.map(x=>x.v));
+  const t = compte(R, r=>r._tronc);
+  barres("ch-tronc","w-tronc", t.map(x=>x.k), t.map(x=>x.v), {couleur:PAL.s3});
+  const d = compte(R, r=>r._div).slice(0,12);
+  barres("ch-div","w-div", d.map(x=>x.k), d.map(x=>x.v));
+
+  const ea = R.filter(r=>r.dernierEtabEA).length;
+  const interne = R.filter(r=>r._interne).length;
+  const lignes = [
+    ["Déjà dans l'établissement l'an dernier", interne],
+    ["Venant d'un autre établissement de l'enseignement agricole", Math.max(0, ea - interne)],
+    ["Venant de l'Éducation nationale ou d'ailleurs", Math.max(0, n - ea)],
+    ["Première inscription dans l'établissement", nouveaux]
+  ];
+  $("#tab-origine-synth tbody").innerHTML = lignes.map(([l,v])=>
+    `<tr><td>${l}</td><td class="num"><b>${v}</b></td><td class="num" style="white-space:nowrap;width:64px">${fmtPct(v,n)}</td>
+     <td style="width:110px"><div class="barmini"><i style="width:${pct(v,n)}%"></i></div></td></tr>`).join("");
+}
+
+/* =========================================================
+   10. RENDU — DIVISIONS & SEUILS
+   ========================================================= */
+function divisions(R){
+  const m = new Map();
+  R.forEach(r=>{
+    const k = r._div;
+    if(!m.has(k)) m.set(k,{code:k, lib:(r._divLib && r._divLib!==k)? r._divLib : "",
+                          cycle:r._cycle, filiere:r._filiere,
+                          formation:r.formation||"—", eleves:[]});
+    m.get(k).eleves.push(r);
+  });
+  return Array.from(m.values()).map(d=>({...d, eff:d.eleves.length,
+      seuils: seuilsDe(d.code)}))
+    .sort((a,b)=> a.filiere.localeCompare(b.filiere,"fr") || a.code.localeCompare(b.code,"fr"));
+}
+function rendreDivisions(){
+  const R = actifs(DS_A);
+  const ds = divisions(R);
+  rendreSelecteurDivisions("sel-div-divisions");
+
+  // seuils généraux
+  SEUILS_DEFAUT.forEach((v,i)=>{ const el = $("#s-glob-"+(i+1)); if(el && el.value != v) el.value = v; });
+  $$(".in-glob").forEach((inp,i)=>inp.onchange = e=>{
+    SEUILS_DEFAUT[i] = Math.max(0, +e.target.value || 0);
+    stockEcrire(CLE_SEUILS_GLOB, SEUILS_DEFAUT);
+    rendreDivisions();
+  });
+
+  let franchis = 0, places = 0;
+  ds.forEach(d=>{
+    franchis += d.seuils.filter(x=>d.eff>=x).length;
+    places += Math.max(0, d.seuils[d.seuils.length-1] - d.eff);
+  });
+  kpi($("#kpi-div"), [
+    {l:"Divisions", v:ds.length, d:perimetreTexte()},
+    {l:"Effectif", v:R.length, d:`moyenne ${ds.length? Math.round(R.length/ds.length) : 0} par division`},
+    {l:"Seuils franchis", v:franchis, c:"violet", d:`sur ${ds.length*SEUILS_DEFAUT.length} possibles`},
+    {l:"Places jusqu'au seuil haut", v:places, c:"or", d:"marge avant le dernier seuil"}
+  ]);
+
+  // Échelle commune à toutes les barres : comparer les divisions entre elles a du sens.
+  const maxEff = Math.max(...ds.map(d=>d.eff), ...SEUILS_DEFAUT, 1);
+  const large = maxEff * 1.08;
+
+  $("#liste-divisions").innerHTML = ds.map(d=>{
+    const nb = d.seuils.filter(x=>d.eff>=x).length;
+    const rep = d.seuils.map(x=>`<div class="seuil" style="left:${x/large*100}%"><span>${x}</span></div>`).join("");
+    return `<div class="divrow">
+      <span class="ident"><span class="code">${d.code}</span>${d.lib?`<span class="lib">${d.lib}</span>`:""}</span>
+      <span class="eff">${d.eff}</span>
+      <span class="barre"><span class="fill" style="width:${Math.min(d.eff/large*100,100)}%"></span>${rep}</span>
+      <span class="etat">${nb}/${d.seuils.length} seuils</span>
+    </div>`;
+  }).join("") || `<div class="note">Aucune division dans ce périmètre.</div>`;
+
+  // réglages par division
+  $("#tab-seuils tbody").innerHTML = ds.map(d=>`<tr>
+      <td>${d.code}${d.lib?` <span class="lib" style="color:var(--gris)">${d.lib}</span>`:""}</td>
+      <td class="num">${d.eff}</td>
+      <td><span class="seuil-inputs">${d.seuils.map((x,i)=>
+        `<input type="number" min="0" max="99" value="${x}" data-div="${d.code}" data-i="${i}" class="in-seuil">`).join("")}</span></td>
+      <td>${SEUILS[d.code]? `<button class="act sec" data-raz="${d.code}" style="padding:3px 9px;font-size:11.5px">règle générale</button>` : ""}</td>
+    </tr>`).join("");
+  $$(".in-seuil").forEach(inp=>inp.onchange = e=>{
+    const code = e.target.dataset.div, i = +e.target.dataset.i;
+    const d = ds.find(x=>x.code===code); if(!d) return;
+    const v = (SEUILS[code] || d.seuils).slice();
+    v[i] = Math.max(0, +e.target.value || 0);
+    SEUILS[code] = v; stockEcrire(CLE_SEUILS, SEUILS); rendreDivisions();
+  });
+  $$("button[data-raz]").forEach(b=>b.onclick = e=>{
+    delete SEUILS[e.target.dataset.raz]; stockEcrire(CLE_SEUILS, SEUILS); rendreDivisions();
+  });
+}
+function exporterSeuils(){
+  telecharger("seuils-divisions.json", JSON.stringify({generaux:SEUILS_DEFAUT, parDivision:SEUILS}, null, 2), "application/json");
+}
+function reinitSeuils(){
+  SEUILS = {}; SEUILS_DEFAUT = [19,27,32];
+  stockEcrire(CLE_SEUILS, SEUILS); stockEcrire(CLE_SEUILS_GLOB, SEUILS_DEFAUT);
+  rendreDivisions();
+}
+
+/* =========================================================
+   11. RENDU — BASSIN
+   ========================================================= */
+let map=null, couches=[], cercles=[], refCarte=null;
+function coordDe(r){
+  if(r._commune){ const g = GEO[norm(r._commune)]; if(g) return g; }
+  if(r.inseeCom){ const g = GEO["insee:"+r.inseeCom]; if(g) return g; }
+  return null;
+}
+/* Agrégation par commune de résidence des apprenants. */
+function ventile(e, r){   // qui vient d'ou, division par division
+  e.divs = e.divs || new Map();
+  e.divs.set(r._div, (e.divs.get(r._div)||0) + 1);
+}
+function detailDivisions(e, max){
+  if(!e.divs) return "";
+  return Array.from(e.divs, ([k,v])=>({k,v})).sort((a,b)=>b.v-a.v)
+    .slice(0, max||99).map(x=>`${x.k} : ${x.v}`).join("<br>");
+}
+function resumeDivisions(e){
+  if(!e.divs) return "—";
+  const a = Array.from(e.divs, ([k,v])=>({k,v})).sort((x,y)=>y.v-x.v);
+  const t = a.slice(0,3).map(x=>`${x.k} (${x.v})`).join(", ");
+  return a.length>3 ? t + ` +${a.length-3}` : t;
+}
+function agregCommunes(R){
+  const m = new Map();
+  R.forEach(r=>{
+    const nom = r._commune || (r.inseeCom? "INSEE "+r.inseeCom : null);
+    if(!nom) return;
+    if(!m.has(nom)) m.set(nom, {nom, n:0, insee:r.inseeCom||null, dep:r._dep, coord:coordDe(r)});
+    const e = m.get(nom); e.n++; if(!e.coord) e.coord = coordDe(r);
+    ventile(e, r);
+  });
+  return Array.from(m.values()).map(c=>({...c, dist: c.coord? distKm(c.coord[0],c.coord[1]) : null}))
+    .sort((a,b)=>b.n-a.n);
+}
+
+/* Agrégation par établissement fréquenté l'année précédente.
+   Géolocalisé sur la commune lue dans « Antér.N-1 : CP com.étab. ». */
+function agregEtablissements(R, avecInterne){
+  const m = new Map();
+  R.forEach(r=>{
+    const nom = r._etabOrig;
+    if(!nom) return;
+    const interne = r._interne;
+    if(!avecInterne && interne) return;
+    if(!m.has(nom)) m.set(nom, {nom, n:0, commune:r._etabCom, cp:r._etabCP,
+                               dep: r._etabCP ? r._etabCP.slice(0,2) : null,
+                               uai: uaiDe(r.antN1Etab), interne, coord:null});
+    const e = m.get(nom); e.n++; ventile(e, r);
+    if(!e.commune && r._etabCom) e.commune = r._etabCom;
+    if(!e.coord && r._etabCom) e.coord = GEO[norm(r._etabCom)] || null;
+  });
+  return Array.from(m.values()).map(e=>({...e, dist: e.coord? distKm(e.coord[0],e.coord[1]) : null}))
+    .sort((a,b)=>b.n-a.n);
+}
+
+function enteteTable(cols){
+  $("#tab-communes thead").innerHTML = "<tr>" + cols.map(c=>
+    `<th${c[1]?' class="num"':''}>${c[0]}</th>`).join("") + "</tr>";
+}
+
+function rendreBassin(){
+  const R = actifs(DS_A);
+  const vue = $("#sel-vue").value;
+  rendreSelecteurDivisions("sel-div-bassin");
+  const n = R.length;
+  const perim = perimetreTexte();
+
+  $("#bloc-communes").hidden = (vue!=="communes");
+  $("#bloc-etabs").hidden    = (vue!=="etabs");
+
+  let points = [];   // {nom, n, coord, dist}
+
+  if(vue === "communes"){
+    $("#t-liste").textContent = "Communes d'origine";
+    $("#t-deps").textContent  = "Départements de résidence";
+    $("#lg-points").innerHTML = '<span class="dot" style="background:var(--s1);opacity:.6"></span> Commune de résidence (taille = effectif)';
+    const com = agregCommunes(R);
+    points = com;
+    const dists = [];
+    R.forEach(r=>{ const g=coordDe(r); if(g) dists.push(distKm(g[0],g[1])); });
+    const med = dists.length ? dists.slice().sort((a,b)=>a-b)[Math.floor(dists.length/2)] : null;
+    kpi($("#kpi-bassin"), [
+      {l:"Élèves du périmètre", v:n, c:"bleu", d:perim},
+      {l:"Communes de résidence", v:com.length, d: com[0]? "1ʳᵉ : "+com[0].nom : "—"},
+      {l:"Départements", v:new Set(R.map(r=>r._dep).filter(Boolean)).size, c:"or",
+       d: ETAB.dep ? `${fmtPct(R.filter(r=>r._dep===ETAB.dep).length,n)} dans le ${ETAB.dep}` : "département de l'établissement inconnu"},
+      {l:"Distance médiane", v: med!=null? Math.round(med)+" km":"—", c:"orange",
+       d: med!=null? `sur ${dists.length} élèves géolocalisés` : "géolocalisation à compléter"}
+    ]);
+    enteteTable([["Commune",0],["Élèves",1],["Dist.",1],["Part",1],["Divisions",0]]);
+    $("#hint-communes").textContent =
+      `${com.length} communes · ${R.filter(r=>!r.cp && !r.inseeCom).length} élève(s) sans code postal ni code INSEE.`;
+    $("#tab-communes tbody").innerHTML = com.slice(0,80).map(c=>
+      `<tr><td>${c.nom}</td><td class="num">${c.n}</td>
+       <td class="num">${c.dist!=null? Math.round(c.dist)+" km" : "—"}</td>
+       <td class="num">${fmtPct(c.n,n)}</td>
+       <td style="font-size:11.5px;color:var(--gris)">${resumeDivisions(c)}</td></tr>`).join("");
+    $("#hint-deps").textContent = "Calculé sans coordonnées : fonctionne même sans référentiel géographique.";
+    remplirDeps(compte(R, r=>r._dep), n);
+
+    // Éloignement × régime
+    const bandes = [[0,10,"moins de 10 km"],[10,25,"10 à 25 km"],[25,50,"25 à 50 km"],[50,100,"50 à 100 km"],[100,1e9,"plus de 100 km"]];
+    const regimes = compte(R, r=>r.regime||"(non renseigné)").slice(0,3).map(x=>x.k);
+    const dansBande = (r,b)=>{ const g=coordDe(r); if(!g) return false; const d=distKm(g[0],g[1]); return d>=b[0] && d<b[1]; };
+    const series = regimes.map(rg=>({nom:rg, data:bandes.map(b=>
+      R.filter(r=>dansBande(r,b) && (r.regime||"(non renseigné)")===rg).length)}));
+    const autres = bandes.map(b=>R.filter(r=>dansBande(r,b) && !regimes.includes(r.regime||"(non renseigné)")).length);
+    if(autres.some(v=>v>0)) series.push({nom:"Autres régimes", data:autres});
+    barresEmpilees("ch-dist","w-dist", bandes.map(b=>b[2]), series);
+
+  } else {
+    $("#t-liste").textContent = "Établissements d'origine (N‑1)";
+    $("#t-deps").textContent  = "Départements des établissements d'origine";
+    $("#lg-points").innerHTML = '<span class="dot" style="background:var(--s2);opacity:.7"></span> Établissement d\'origine (taille = élèves recrutés)';
+    const tous = agregEtablissements(R, true);
+    const externes = tous.filter(e=>!e.interne);
+    points = tous.map(e=>({nom:e.nom, n:e.n, coord:e.coord, dist:e.dist, commune:e.commune, divs:e.divs}));
+    const interne = R.filter(r=>r._interne).length;
+    const ea = R.filter(r=>r.dernierEtabEA).length;
+    const sansOrig = R.filter(r=>!r._etabOrig).length;
+    const distsE = tous.filter(e=>e.dist!=null);
+    const medE = distsE.length ? distsE.map(e=>e.dist).sort((a,b)=>a-b)[Math.floor(distsE.length/2)] : null;
+    kpi($("#kpi-bassin"), [
+      {l:"Élèves du périmètre", v:n, c:"bleu", d:perim},
+      {l:"Établissements nourriciers", v:externes.length, c:"orange",
+       d: externes[0]? "1ᵉʳ : "+(externes[0].nom.length>28? externes[0].nom.slice(0,26)+"…" : externes[0].nom) : "—"},
+      {l:"Recrutement interne", v:fmtPct(interne,n), d:`${interne} élèves déjà présents en N‑1`},
+      {l:"Issus de l'ens. agricole", v:fmtPct(ea,n), c:"or", d:`${ea} élèves`},
+      {l:"Éloignement maximal", v: medE!=null && distsE.length ? Math.round(Math.max(...distsE.map(e=>e.dist)))+" km" : "—",
+       c:"violet", d: medE!=null ? `médiane ${Math.round(medE)} km` : "géolocalisation à compléter"},
+      {l:"Origine non renseignée", v:sansOrig, c:sansOrig?"rouge":"", d:sansOrig? fmtPct(sansOrig,n)+" des lignes" : "export complet"}
+    ]);
+    enteteTable([["Établissement",0],["Commune",0],["Élèves",1],["Dist.",1],["Part",1],["Divisions d" + "\u2019" + "accueil",0]]);
+    $("#hint-communes").textContent =
+      `${tous.length} établissements d'origine · ${sansOrig} élève(s) sans établissement N‑1 renseigné.`;
+    $("#tab-communes tbody").innerHTML = tous.slice(0,80).map(e=>
+      `<tr><td>${e.nom}${e.interne?' <span class="pill ok">interne</span>':""}</td>
+       <td>${e.commune||"—"}</td><td class="num">${e.n}</td>
+       <td class="num">${e.dist!=null? Math.round(e.dist)+" km" : "—"}</td>
+       <td class="num">${fmtPct(e.n,n)}</td>
+       <td style="font-size:11.5px;color:var(--gris)">${resumeDivisions(e)}</td></tr>`).join("");
+    $("#hint-deps").textContent = "Département de l'établissement fréquenté en N‑1, d'après son code postal.";
+    remplirDeps(compte(R, r=>r._etabCP ? r._etabCP.slice(0,2) : null), n);
+
+    const e15 = externes.slice(0,15);
+    barres("ch-etab","w-etab", e15.map(x=>x.nom.length>42? x.nom.slice(0,40)+"…" : x.nom), e15.map(x=>x.n), {couleur:PAL.s2});
+    const mefs = compte(R, r=>r._mefOrig).slice(0,15);
+    barres("ch-mef","w-mef", mefs.map(x=>x.k.length>36? x.k.slice(0,34)+"…" : x.k), mefs.map(x=>x.v));
+  }
+
+  $("#lg-div").textContent = FILTRES.divisions.size === 1
+    ? "Périmètre : division " + Array.from(FILTRES.divisions)[0]
+    : "Cliquez un point : le détail par division s'affiche";
+  dessinerCarte(points, n, vue);
+  rendreFluxEtInterne(R);
+}
+
+function remplirDeps(deps, n){
+  const maxd = deps.length? deps[0].v : 1;
+  $("#tab-deps tbody").innerHTML = deps.map(d=>
+    `<tr><td>${d.k}</td><td class="num">${d.v}</td><td class="num">${fmtPct(d.v,n)}</td>
+     <td style="width:110px"><div class="barmini"><i style="width:${pct(d.v,maxd)}%"></i></div></td></tr>`).join("")
+    || `<tr><td colspan="4" style="color:var(--encre3)">Aucune donnée géographique exploitable.</td></tr>`;
+}
+
+function dessinerCarte(points, n, vue){
+  const situes = points.filter(p=>p.coord);
+  const manque = points.length - situes.length;
+  const gm = $("#geo-manque");
+  if(manque>0){
+    gm.hidden=false;
+    gm.innerHTML = `<b>${manque} ${vue==="communes"?"commune(s)":"établissement(s)"} sur ${points.length} sans coordonnées</b> —
+      ils figurent dans les tableaux mais pas sur la carte.
+      Utilisez « Compléter via geo.api.gouv.fr » ou importez un référentiel CSV (colonnes <code>code_insee, nom, lat, lon</code>).`;
+  } else gm.hidden = true;
+  $("#geo-etat").innerHTML = `Référentiel : ${GEO_SOURCE} · ${Object.keys(GEO).length} entrées`;
+
+  if(!LEAFLET_OK){
+    $("#map-carte").innerHTML = '<div style="padding:26px;text-align:center;color:var(--gris);font-size:13px">Carte indisponible hors connexion — les tableaux ci-dessous restent complets.</div>';
+    return;
+  }
+  if(!map) initCarte();
+  else if(refCarte !== (ETAB.lat+","+ETAB.lon)){ map.remove(); map=null; couches=[]; cercles=[]; initCarte(); }
+  couches.forEach(l=>map.removeLayer(l)); couches=[];
+  const coul = vue==="communes" ? PAL.s1 : PAL.s2;
+  situes.forEach(p=>{
+    const m = L.circleMarker(p.coord, {radius:5+Math.sqrt(p.n)*2.4, color:coul, fillColor:coul, fillOpacity:.5, weight:1})
+      .addTo(map).bindPopup(
+        `<b>${p.nom}</b>${p.commune?"<br>"+p.commune:""}<br>${p.n} élève(s) — ${fmtPct(p.n,n)}` +
+        (p.dist!=null? `<br>${Math.round(p.dist)} km` : "") +
+        (p.divs? `<br><br><b>Divisions</b><br>${detailDivisions(p, 12)}` : ""));
+    couches.push(m);
+  });
+  setTimeout(()=>{ map.invalidateSize(); if(situes.length) map.fitBounds(L.latLngBounds(situes.map(p=>p.coord)).pad(0.15)); }, 60);
+}
+
+function initCarte(){
+  const aRef = (ETAB.lat!=null && ETAB.lon!=null);
+  map = L.map("map-carte").setView(aRef ? [ETAB.lat, ETAB.lon] : [46.6, 2.4], aRef ? 9 : 6);
+  /* Fonds de plan ouverts acceptant l'usage applicatif.
+     Les serveurs de tuiles d'OpenStreetMap.org refusent les applications tierces (erreur 403) :
+     on utilise le Plan IGN de la Géoplateforme (service public, sans clé) avec CARTO en secours. */
+  const fonds = {
+    "Plan IGN": L.tileLayer(
+      "https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2" +
+      "&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png",
+      {maxZoom:18, minZoom:5, attribution:"© IGN — Géoplateforme"}),
+    "Fond clair (CARTO)": L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+      {maxZoom:19, subdomains:"abcd", attribution:"© OpenStreetMap · © CARTO"}),
+    "Aucun fond": L.tileLayer("", {attribution:""})
+  };
+  let echecs = 0;
+  Object.values(fonds).forEach(c=>c.on("tileerror", ()=>{
+    if(++echecs === 8){
+      const n = document.createElement("div");
+      n.className = "note alerte mt";
+      n.innerHTML = "<b>Fond de carte indisponible.</b> Le serveur de tuiles ne répond pas ou est bloqué par le réseau " +
+        "de l'établissement. Basculez sur un autre fond avec le sélecteur en haut à droite de la carte, ou passez sur " +
+        "« Aucun fond » : les cercles de provenance et les tableaux restent exacts.";
+      const carte = document.getElementById("map-carte");
+      if(carte && !carte.nextElementSibling?.classList?.contains("alerte")) carte.after(n);
+    }
+  }));
+  fonds["Plan IGN"].addTo(map);
+  L.control.layers(fonds, null, {position:"topright"}).addTo(map);
+  refCarte = ETAB.lat+","+ETAB.lon;
+  if(aRef){
+    [25000,50000].forEach(r=>cercles.push(L.circle([ETAB.lat,ETAB.lon],
+      {radius:r, color:"#c9a227", fillColor:"#c9a227", fillOpacity:.04, weight:1.4, dashArray:"6 5"}).addTo(map)));
+    L.marker([ETAB.lat,ETAB.lon]).addTo(map).bindPopup("<b>"+ETAB.nom+"</b>");
+  }
+}
+
+/* Flux et recrutement interne — valables quelle que soit la vue. */
+function rendreFluxEtInterne(R){
+  const flux = new Map();
+  R.forEach(r=>{
+    const k = [r._mefOrig||"(non renseigné)", r._etabOrig||"(non renseigné)", r.formation||"(non renseignée)"].join("§");
+    flux.set(k, (flux.get(k)||0)+1);
+  });
+  const tri = Array.from(flux, ([k,v])=>({k:k.split("§"), v})).sort((a,b)=>b.v-a.v).slice(0,25);
+  $("#tab-flux tbody").innerHTML = tri.map(f=>{
+    const int = estNous(f.k[1]);
+    return `<tr><td>${f.k[0]}</td><td>${f.k[1]}</td><td>${f.k[2]}</td><td class="num"><b>${f.v}</b></td>
+      <td><span class="pill ${int?"ok":"neutre"}">${int?"interne":"externe"}</span></td></tr>`;
+  }).join("");
+
+  $("#tab-interne tbody").innerHTML = divisions(R).map(d=>{
+    const i = d.eleves.filter(r=>r._interne).length;
+    return `<tr><td>${d.code}${d.lib?` <span style="color:var(--gris);font-size:11.5px">${d.lib}</span>`:""}</td><td>${d.filiere}</td><td class="num">${d.eff}</td>
+      <td class="num">${i}</td><td class="num">${fmtPct(i,d.eff)}</td>
+      <td style="width:110px"><div class="barmini"><i style="width:${pct(i,d.eff)}%"></i></div></td></tr>`;
+  }).join("");
+}
+
+/* Complétion géographique via l'API publique des découpages administratifs.
+   Couvre les départements de résidence ET ceux des établissements d'origine. */
+async function completerGeo(){
+  const btn = $("#btn-geo"); btn.disabled = true; const avant = btn.textContent;
+  try{
+    const deps = Array.from(new Set([
+      ...DS_A.records.map(r=>r._dep),
+      ...DS_A.records.map(r=>r._etabCP ? r._etabCP.slice(0,2) : null),
+      ETAB.dep
+    ].filter(Boolean)));
+    btn.textContent = `Récupération de ${deps.length} département(s)…`;
+    for(const d of deps){
+      const rep = await fetch(`https://geo.api.gouv.fr/departements/${d}/communes?fields=code,nom,centre&format=json`);
+      if(!rep.ok) continue;
+      (await rep.json()).forEach(c=>{
+        if(!c.centre || !c.centre.coordinates) return;
+        const [lon,lat] = c.centre.coordinates;
+        GEO[norm(c.nom)] = [lat,lon];
+        GEO["insee:"+c.code] = [lat,lon];
+      });
+    }
+    const cache = {}; Object.entries(GEO).forEach(([k,v])=>{ if(!GEO_EMBARQUE[k]) cache[k]=v; });
+    stockEcrire(CLE_GEO, cache);
+    GEO_SOURCE = "geo.api.gouv.fr (mis en cache)";
+    btn.textContent = avant; btn.disabled = false;
+    definirEtab(DS_A, FILTRES.etab==="ALL" ? null : FILTRES.etab);
+    toutRendre();
+  }catch(e){
+    btn.textContent = avant; btn.disabled = false;
+    $("#geo-etat").innerHTML = `<span style="color:var(--rouge)">Échec de la récupération (hors ligne ou accès réseau bloqué). Utilisez l'import CSV.</span>`;
+  }
+}
+function importerGeoCSV(file){
+  const fr = new FileReader();
+  fr.onload = () => {
+    const texte = fr.result;
+    const L = decouper(texte, detecterSep(texte.split("\n")[0]));
+    const h = L[0].map(x=>norm(x));
+    const iN = h.findIndex(x=>/^(nom|nom commune|commune|libelle)/.test(x));
+    const iI = h.findIndex(x=>/(insee|code commune|code)/.test(x));
+    const iLat = h.findIndex(x=>/^(lat|latitude|y)$/.test(x));
+    const iLon = h.findIndex(x=>/^(lon|lng|longitude|x)$/.test(x));
+    const iGPS = h.findIndex(x=>/coordonnees|gps/.test(x));
+    let n=0;
+    for(let k=1;k<L.length;k++){
+      const row=L[k]; let lat=null, lon=null;
+      if(iLat>=0 && iLon>=0){ lat=parseFloat((row[iLat]||"").replace(",",".")); lon=parseFloat((row[iLon]||"").replace(",",".")); }
+      else if(iGPS>=0){ const p=(row[iGPS]||"").split(","); lat=parseFloat(p[0]); lon=parseFloat(p[1]); }
+      if(!isFinite(lat)||!isFinite(lon)) continue;
+      if(iN>=0 && row[iN]) GEO[norm(row[iN])]=[lat,lon];
+      if(iI>=0 && row[iI]) GEO["insee:"+row[iI].trim()]=[lat,lon];
+      n++;
+    }
+    const cache = {}; Object.entries(GEO).forEach(([k,v])=>{ if(!GEO_EMBARQUE[k]) cache[k]=v; });
+    stockEcrire(CLE_GEO, cache);
+    GEO_SOURCE = `CSV importé (${n} communes)`;
+    definirEtab(DS_A, FILTRES.etab==="ALL" ? null : FILTRES.etab);
+    toutRendre();
+  };
+  fr.readAsText(file, "UTF-8");
+}
+
+/* =========================================================
+   13. RENDU — PROFIL
+   ========================================================= */
+function rendreProfil(){
+  const R = actifs(DS_A);
+  rendreSelecteurDivisions("sel-div-profil");
+  const perimetre = perimetreTexte();
+  const n = R.length;
+  if(n === 0){
+    kpi($("#kpi-profil"), [{l:"Effectif", v:0, d:perimetre}]);
+    ["ch-regime","ch-age","ch-sexe","ch-csp"].forEach(id=>{ if(CHARTS[id]){ CHARTS[id].destroy(); delete CHARTS[id]; } });
+    $("#tab-options tbody").innerHTML = `<tr><td colspan="4" style="color:var(--encre3)">Aucun élève dans ce périmètre.</td></tr>`;
+    return;
+  }
+  const filles = R.filter(r=>r._fille).length;
+  const heberges = R.filter(r=>r._heberge).length;
+  const redoub = R.filter(r=>/^o/i.test(r.redoublant||"")).length;
+  const selo = R.filter(r=>r.selo).length;
+  const lv2 = R.filter(r=>r.lv2).length;
+  const monop = R.filter(r=>r.resp1Lien && !r.resp2Lien).length;
+  kpi($("#kpi-profil"), [
+    {l:"Effectif", v:n, d:perimetre},
+    {l:"Filles / garçons", v:`${filles} / ${n-filles}`, c:"violet", d:fmtPct(filles,n)+" de filles"},
+    {l:"Hébergés (internat + DP)", v:fmtPct(heberges,n), c:"bleu", d:`${heberges} élèves`},
+    {l:"Redoublants", v:redoub, c:"orange", d:fmtPct(redoub,n)},
+    {l:"Familles à 1 responsable", v:fmtPct(monop,n), c:"or", d:`${monop} familles sur ${n}`},
+    {l:"Section européenne", v:selo, c:"rouge", d:selo? fmtPct(selo,n) : "aucune saisie"}
+  ]);
+
+  const rg = compte(R, r=>r.regime||"(non renseigné)");
+  barres("ch-regime","w-regime", rg.map(x=>x.k), rg.map(x=>x.v));
+  const ag = compte(R, r=> (r._age!=null && r._age>8 && r._age<40) ? r._age+" ans" : null)
+             .sort((a,b)=>parseInt(a.k)-parseInt(b.k));
+  barres("ch-age","w-age", ag.map(x=>x.k), ag.map(x=>x.v), {couleur:PAL.s3});
+
+  // Au niveau global on répartit par cycle ; dès qu'une formation est choisie, le cycle
+  // n'a plus qu'une modalité — on descend alors à la division.
+  const parDivision = (new Set(R.map(r=>r._cycle)).size <= 1) || FILTRES.divisions.size > 0;
+  const cle = parDivision ? (r=>r._div) : (r=>r._cycle);
+  const mods = parDivision
+    ? compte(R, cle).map(x=>x.k)
+    : compte(R, cle).sort((a,b)=>rangCycle(a.k)-rangCycle(b.k)).map(x=>x.k);
+  $("#titre-sexe").textContent = parDivision ? "Sexe par division" : "Sexe par cycle";
+  barresEmpilees("ch-sexe","w-sexe", mods, [
+    {nom:"Filles",  data:mods.map(m=>R.filter(r=>cle(r)===m && r._fille).length)},
+    {nom:"Garçons", data:mods.map(m=>R.filter(r=>cle(r)===m && !r._fille).length)}
+  ]);
+
+  const csp = compte(R, r=>r.resp1Grp || null);
+  if(csp.length){
+    if(!$("#ch-csp")) $("#w-csp").innerHTML = '<canvas id="ch-csp"></canvas>';
+    barres("ch-csp","w-csp", csp.map(x=>x.k.length>40?x.k.slice(0,38)+"…":x.k), csp.map(x=>x.v), {couleur:PAL.s2});
+  } else {
+    if(CHARTS["ch-csp"]){ CHARTS["ch-csp"].destroy(); delete CHARTS["ch-csp"]; }
+    $("#w-csp").innerHTML = `<div class="note" style="margin-top:20px">Colonne « Resp.Lég1 : groupe SP » absente de l'export : répartition socio-professionnelle indisponible.</div>`;
+  }
+
+  const opts = [];
+  compte(R, r=>r.lv2).forEach(x=>opts.push({e:x.k, c:"LV2", v:x.v}));
+  compte(R, r=>r.optionsFac).forEach(x=>opts.push({e:x.k, c:"Enseignement facultatif", v:x.v}));
+  compte(R, r=>r.selo).forEach(x=>opts.push({e:x.k, c:"Section européenne", v:x.v}));
+  compte(R, r=>r.lv1).forEach(x=>opts.push({e:x.k, c:"LV1", v:x.v}));
+  opts.sort((a,b)=>b.v-a.v);
+  $("#tab-options tbody").innerHTML = opts.map(o=>
+    `<tr><td>${o.e}</td><td>${o.c}</td><td class="num">${o.v}</td><td class="num">${fmtPct(o.v,n)}</td></tr>`).join("")
+    || `<tr><td colspan="4" style="color:var(--encre3)">Aucune option saisie dans l'export.</td></tr>`;
+}
+
+/* =========================================================
+   14. RENDU — COMPARAISON
+   ========================================================= */
+/* =========================================================
+   14. RENDU — ÉVOLUTION PLURIANNUELLE
+   ========================================================= */
+function mediane(v){
+  if(!v.length) return null;
+  const t = v.slice().sort((a,b)=>a-b);
+  return t[Math.floor(t.length/2)];
+}
+function indicateursDe(ds){
+  const R = actifs(ds), n = R.length;
+  const d = [];
+  R.forEach(r=>{ const g = coordDe(r); if(g){ const k = distKm(g[0],g[1]); if(k!=null) d.push(k); } });
+  return {
+    annee: ds.rentree, n,
+    nouveaux: R.filter(r=>r._nouveau).length,
+    filles: R.filter(r=>r._fille).length,
+    heberges: R.filter(r=>r._heberge).length,
+    boursiers: R.filter(r=>r._boursier).length,
+    internes: R.filter(r=>r._interne).length,
+    local: ETAB.dep ? R.filter(r=>r._dep===ETAB.dep).length : null,
+    distMed: mediane(d),
+    divisions: new Set(R.map(r=>r._div)).size,
+    communes: new Set(R.map(r=>r._commune).filter(Boolean)).size,
+    nourriciers: new Set(R.filter(r=>!r._interne).map(r=>r._etabOrig).filter(Boolean)).size
+  };
+}
+
+function rendreEvolution(){
+  const corps = $("#tab-serie tbody");
+  $("#hint-serie").textContent = SERIE.length
+    ? `${SERIE.length} millésime(s) en mémoire. Recharger une rentrée déjà présente la remplace.`
+    : "Aucun millésime chargé pour l'instant.";
+  corps.innerHTML = SERIE.map(ds=>{
+    const R = actifs(ds);
+    return `<tr${ds===DS_A?' style="background:var(--vert-clair)"':''}>
+      <td><b>${ds.rentree}‑${ds.rentree+1}</b>${ds===DS_A?' <span class="pill ok">analysée</span>':''}</td>
+      <td style="font-size:12px">${ds.nomFichier}</td>
+      <td class="num">${ds.records.length}</td>
+      <td class="num">${R.length}</td>
+      <td class="num">${new Set(R.map(r=>r._div)).size}</td>
+      <td><button class="act sec" data-retirer="${ds.rentree}" style="padding:3px 9px;font-size:11.5px">retirer</button></td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="6" style="color:var(--encre3)">Aucun fichier chargé.</td></tr>`;
+  $$("button[data-retirer]").forEach(b=>b.onclick = e=>{
+    const a = +e.target.dataset.retirer;
+    SERIE = SERIE.filter(x=>x.rentree !== a);
+    if(DS_A && DS_A.rentree === a) DS_A = SERIE[SERIE.length-1] || null;
+    if(!DS_A){ location.reload(); return; }
+    definirEtab(DS_A, null); toutRendre();
+  });
+
+  if(SERIE.length < 2){ $("#evolution-contenu").hidden = true; return; }
+  $("#evolution-contenu").hidden = false;
+
+  const ind = SERIE.map(indicateursDe);
+  const annees = ind.map(x=>x.annee);
+  const labels = annees.map(a=>`${a}‑${String(a+1).slice(2)}`);
+  const prem = ind[0], dern = ind[ind.length-1];
+  const ecart = dern.n - prem.n;
+  const moy = Math.round(ind.reduce((a,b)=>a+b.n,0)/ind.length);
+
+  kpi($("#kpi-evol"), [
+    {l:"Millésimes", v:SERIE.length, d:`${labels[0]} → ${labels[labels.length-1]}`},
+    {l:`Effectif ${labels[labels.length-1]}`, v:dern.n, c:"bleu", d:perimetreTexte()},
+    {l:"Variation sur la période", v:(ecart>0?"+":"")+ecart, c:ecart>=0?"":"rouge",
+     dc:ecart>=0?"up":"down", d:`${fmtPct(Math.abs(ecart), prem.n)} par rapport à ${labels[0]}`},
+    {l:"Effectif moyen", v:moy, c:"or", d:`plus haut ${Math.max(...ind.map(x=>x.n))} · plus bas ${Math.min(...ind.map(x=>x.n))}`}
+  ]);
+
+  $("#hint-evol-total").textContent = `Périmètre : ${perimetreTexte()}` +
+    (FILTRES.regimes.size ? ` · ${FILTRES.regimes.size} régime(s)` : "") +
+    (FILTRES.sorties === "actifs" ? " · élèves sortis exclus" : "");
+  courbe("ch-evol", "w-evol", labels, ind.map(x=>x.n), "Effectif");
+
+  // ----- petits multiples : une courbe par filière, ou par division si le périmètre est restreint -----
+  const parDiv = FILTRES.divisions.size > 0;
+  $("#titre-multiples").textContent = parDiv ? "Évolution par division" : "Évolution par filière";
+  const cle = parDiv ? (r=>r._div) : (r=>r._filiere);
+  const cles = Array.from(new Set(SERIE.flatMap(ds=>actifs(ds).map(cle)))).sort((a,b)=>a.localeCompare(b,"fr"));
+  const series = cles.map(k=>({k, data:SERIE.map(ds=>actifs(ds).filter(r=>cle(r)===k).length)}));
+  const maxY = Math.max(1, ...series.flatMap(x=>x.data));
+  const host = $("#petits-multiples");
+  host.innerHTML = series.map((x,i)=>{
+    const der = x.data[x.data.length-1], pre = x.data[0];
+    const e = der - pre;
+    return `<div style="border:1px solid #e6ede9;border-radius:10px;padding:10px">
+      <div style="font-size:12.5px;font-weight:700;color:var(--vert-fonce);line-height:1.25">${x.k}</div>
+      <div style="font-size:11.5px;color:var(--gris);margin-bottom:6px">
+        ${pre} → <b>${der}</b> <span style="color:${e>0?'var(--vert)':e<0?'var(--rouge)':'var(--gris)'}">${e>0?"+":""}${e}</span></div>
+      <div style="position:relative;height:96px"><canvas id="pm-${i}"></canvas></div>
+    </div>`;
+  }).join("");
+  series.forEach((x,i)=>courbe("pm-"+i, null, labels, x.data, x.k, maxY));
+
+  // ----- indicateurs par rentrée -----
+  const lignes = [
+    ["Effectif", x=>x.n],
+    ["Nouveaux entrants", x=>`${x.nouveaux} · ${fmtPct(x.nouveaux,x.n)}`],
+    ["Part de filles", x=>fmtPct(x.filles,x.n)],
+    ["Hébergés (internat + DP)", x=>fmtPct(x.heberges,x.n)],
+    ["Boursiers", x=>fmtPct(x.boursiers,x.n)],
+    ["Recrutement interne", x=>fmtPct(x.internes,x.n)],
+    [`Résidant dans le ${ETAB.dep || "département"}`, x=>x.local==null? "—" : fmtPct(x.local,x.n)],
+    ["Distance médiane", x=>x.distMed==null? "—" : Math.round(x.distMed)+" km"],
+    ["Divisions", x=>x.divisions],
+    ["Communes d'origine", x=>x.communes],
+    ["Établissements nourriciers", x=>x.nourriciers]
+  ];
+  $("#tab-evol-ind thead").innerHTML = `<tr><th>Indicateur</th>${labels.map(l=>`<th class="num">${l}</th>`).join("")}</tr>`;
+  $("#tab-evol-ind tbody").innerHTML = lignes.map(([lbl,f])=>
+    `<tr><td>${lbl}</td>${ind.map(x=>`<td class="num">${f(x)}</td>`).join("")}</tr>`).join("");
+
+  // ----- divisions × années -----
+  tableauPluriannuel("#tab-evol-div", "Division", r=>r._div, 99);
+  // ----- établissements d'origine × années -----
+  tableauPluriannuel("#tab-evol-etab", "Établissement d'origine", r=>r._interne? null : r._etabOrig, 20);
+
+  function tableauPluriannuel(sel, titre, cle2, max){
+    const m = new Map();
+    SERIE.forEach((ds,i)=>{
+      actifs(ds).forEach(r=>{
+        const k = cle2(r); if(!k) return;
+        if(!m.has(k)) m.set(k, new Array(SERIE.length).fill(0));
+        m.get(k)[i]++;
+      });
+    });
+    const arr = Array.from(m, ([k,v])=>({k, v, tot:v.reduce((a,b)=>a+b,0), e:v[v.length-1]-v[0]}))
+      .sort((a,b)=>b.tot-a.tot).slice(0, max);
+    $(sel+" thead").innerHTML = `<tr><th>${titre}</th>${labels.map(l=>`<th class="num">${l}</th>`).join("")}<th class="num">Écart</th></tr>`;
+    $(sel+" tbody").innerHTML = arr.map(x=>
+      `<tr><td>${x.k.length>40? x.k.slice(0,38)+"…" : x.k}</td>${x.v.map(v=>`<td class="num">${v||""}</td>`).join("")}
+       <td class="num"><span class="pill ${x.e>0?"ok":x.e<0?"bas":"neutre"}">${x.e>0?"+":""}${x.e}</span></td></tr>`).join("")
+      || `<tr><td colspan="${SERIE.length+2}" style="color:var(--encre3)">Aucune donnée.</td></tr>`;
+  }
+}
+
+/* =========================================================
+   15. RENDU — QUALITÉ
+   ========================================================= */
+function rendreEtabRef(){
+  const ds = DS_A;
+  $("#etab-ref").hidden = false;
+  const l = [
+    ["Nom (UAI administrative)", ETAB.nom],
+    ["Code UAI (RNE)", ETAB.uai || "non renseigné"],
+    ["Département", (ETAB.libDep||"—") + (ETAB.dep? " ("+ETAB.dep+")" : "")],
+    ["Région", ETAB.region || "—"],
+    ["Commune retenue", ETAB.commune || "non déterminée"],
+    ["Origine de la position", ETAB.source],
+    ["Coordonnées", (ETAB.lat!=null) ? ETAB.lat.toFixed(4)+", "+ETAB.lon.toFixed(4) : "aucune — distances et rayons masqués"]
+  ];
+  const autres = (ds.etabs||[]).length > 1
+    ? `<div class="note alerte mt"><b>${ds.etabs.length} établissements d'affectation</b> dans cet export :
+       ${ds.etabs.map(e=>`${e.nom} (${e.n})`).join(" · ")}. Choisissez celui à analyser dans le filtre
+       « Établissement d'affectation », en haut de la vue d'ensemble.</div>` : "";
+  const saisie = `<div style="margin-top:12px;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+      <div><label class="sel" for="in-commune">Commune de l'établissement</label>
+        <input type="text" id="in-commune" style="min-width:240px" value="${ETAB.commune||""}" placeholder="ex. LEMPDES"></div>
+      <button class="act sec" id="btn-commune">Enregistrer la position</button>
+      <span class="src" id="msg-commune" style="margin:0 0 8px 4px"></span>
+    </div>`;
+  $("#etab-ref-corps").innerHTML =
+    `<table>${l.map(([a,b])=>`<tr><td>${a}</td><td class="num"><b>${b}</b></td></tr>`).join("")}</table>` + autres + saisie;
+  $("#btn-commune").onclick = () => {
+    const v = $("#in-commune").value.trim();
+    if(!v) return;
+    if(enregistrerPositionEtab(v)){
+      $("#msg-commune").innerHTML = "✓ position enregistrée";
+      toutRendre();
+    } else {
+      $("#msg-commune").innerHTML = `<span style="color:var(--rouge)">Commune inconnue du référentiel géographique — cliquez d'abord sur « Compléter via geo.api.gouv.fr » dans l'onglet Bassin.</span>`;
+    }
+  };
+}
+
+function rendreQualite(){
+  const ds = DS_A, R = ds.records, n = R.length;
+  $("#qualite").hidden = false;
+  rendreEtabRef();
+
+  const tests = [
+    {t:"Code postal ou code INSEE absent", f:r=>!r.cp && !r.inseeCom,
+     d:"Ces élèves n'apparaissent ni dans la carte ni dans les tableaux de bassin."},
+    {t:"Commune non lisible dans l'adresse", f:r=>!r._commune,
+     d:"La ligne 6 d'adresse ne suit pas le format « 63370 LEMPDES »."},
+    {t:"Date de naissance absente ou hors bornes", f:r=>r._age==null || r._age<10 || r._age>35,
+     d:"Âge calculé au 31 décembre de l'année de rentrée."},
+    {t:"Civilité et sexe contradictoires", f:r=>r.civilite && r.sexe &&
+      ((/^mme/i.test(r.civilite) && /^m/i.test(r.sexe)) || (/^m\.?$/i.test(r.civilite.trim()) && /^f/i.test(r.sexe))),
+     d:"Saisie à reprendre dans FRÉGATA : fausse les répartitions par sexe si la civilité est utilisée ailleurs."},
+    {t:"Établissement d'origine (N‑1) non renseigné", f:r=>!r.antN1Etab,
+     d:"Empêche l'analyse des établissements nourriciers."},
+    {t:"Niveau d'origine (MEF N‑1) non renseigné", f:r=>!r.antN1MEF, d:"Empêche l'analyse des flux."},
+    {t:"Aucun responsable légal", f:r=>!r.resp1Lien && !r.resp2Lien, d:"Ligne incomplète côté famille."},
+    {t:"CSP du responsable 1 non renseignée", f:r=>!r.resp1Grp, d:"Réduit la lecture du profil social."},
+    {t:"Division non renseignée", f:r=>!r.codeDivision && !r.libDivision, d:"L'élève est rattaché à « division non renseignée »."},
+    {t:"Formation non classée dans un cycle", f:r=>r._cycle==="Autre",
+     d:"Le libellé de formation ne correspond à aucun motif connu — à signaler pour affiner l'outil."},
+    {t:"Sortie prématurée déclarée", f:r=>r._sorti,
+     d:"Élèves sortis de l'établissement : exclus par défaut des effectifs."},
+    {t:"Régime d'hébergement non renseigné", f:r=>!r.regime, d:"Fausse le croisement distance × régime."},
+    {t:"Établissement d'affectation non renseigné", f:r=>!r._etabAff,
+     d:"Sans « UAI administrative » ni « UAI opérationnelle », l'établissement de référence ne peut pas être identifié."}
+  ];
+  // Synthèse : pour chaque analyse, la part de l'effectif réellement exploitable.
+  const usages = [
+    {q:"Carte et bassin de recrutement", f:r=>!r.cp && !r.inseeCom, col:"C.Postal / INSEE com.adr."},
+    {q:"Établissements nourriciers et flux", f:r=>!r.antN1Etab, col:"Antér.N-1 : étab."},
+    {q:"Niveaux d'origine", f:r=>!r.antN1MEF, col:"Antér.N-1 : MEF"},
+    {q:"Profil social (CSP)", f:r=>!r.resp1Grp, col:"Resp.Lég1 : groupe SP"},
+    {q:"Âges", f:r=>r._age==null, col:"Date naiss."},
+    {q:"Croisement distance × régime", f:r=>!r.regime, col:"Régime courant"}
+  ];
+  $("#fiabilite").innerHTML = `<table><thead><tr><th>Analyse</th><th class="num">Élèves exploitables</th><th class="num">Part</th><th>Colonne source</th></tr></thead><tbody>` +
+    usages.map(u=>{
+      const manque = R.filter(u.f).length, ok = n - manque;
+      return `<tr><td>${u.q}</td><td class="num"><b>${ok}</b> / ${n}</td>
+        <td class="num">${fmtPct(ok,n)}</td>
+        <td style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--gris)">${u.col}</td></tr>`;
+    }).join("") + `</tbody></table>`;
+
+  $("#liste-anomalies").innerHTML = tests.map(t=>{
+    const k = R.filter(t.f).length;
+    const cls = k===0 ? "ok" : (k/n>0.1 ? "grave" : "");
+    return `<div class="anomalie ${cls}"><div class="t">${k===0?"✓ ":""}${t.t} — <b>${k}</b> ligne(s)${k?` · ${fmtPct(k,n)}`:""}</div>
+      <div class="d">${t.d}</div></div>`;
+  }).join("");
+
+  $("#hint-cols").innerHTML = `— ${ds.nbColonnes} colonnes lues, ${ds.trouves.length} exploitées, ${ds.ignorees.length} ignorées`;
+  $("#cols-rapport").innerHTML = `
+    <div style="font-size:12px;font-weight:600;color:var(--vert-fonce);margin-top:8px">Colonnes exploitées</div>
+    <div class="cols">${ds.trouves.map(c=>`<span class="coltag ok">${LIB_COL[c]||c}</span>`).join("")}</div>
+    ${ds.manquants.length?`<div style="font-size:12px;font-weight:600;color:var(--rouge);margin-top:10px">Colonnes attendues et absentes</div>
+      <div class="cols">${ds.manquants.map(c=>`<span class="coltag abs">${LIB_COL[c]||c}</span>`).join("")}</div>`:""}
+    <details style="margin-top:10px"><summary>Colonnes ignorées (${ds.ignorees.length})</summary>
+      <div class="cols">${ds.ignorees.map(c=>`<span class="coltag">${c||"(sans titre)"}</span>`).join("")}</div></details>`;
+
+  // Doublons
+  const m = new Map();
+  R.forEach(r=>{
+    const k = norm([r.nom, r.prenom, r.dateNaiss].join("|"));
+    if(k.length<3) return;
+    if(!m.has(k)) m.set(k, {nom:r.nom, prenom:r.prenom, dn:r.dateNaiss, divs:[], n:0});
+    const e=m.get(k); e.n++; e.divs.push(r._divLib);
+  });
+  const dbl = Array.from(m.values()).filter(x=>x.n>1).sort((a,b)=>b.n-a.n);
+  const dessinerDoublons = () => {
+    const montrer = $("#chk-noms").checked;
+    $("#tab-doublons tbody").innerHTML = dbl.map(d=>{
+      const id = montrer ? `${d.nom} ${d.prenom} — ${d.dn}`
+                         : `${(d.nom||"").slice(0,1)}*** ${(d.prenom||"").slice(0,1)}. — né(e) le ${d.dn||"?"}`;
+      return `<tr><td>${id}</td><td class="num">${d.n}</td><td>${Array.from(new Set(d.divs)).join(", ")}</td></tr>`;
+    }).join("") || `<tr><td colspan="3" style="color:var(--vert)">Aucun doublon détecté.</td></tr>`;
+  };
+  $("#cnt-doublons").textContent = dbl.length ? `— ${dbl.length} identité(s) en double` : "— aucun";
+  $("#chk-noms").onchange = dessinerDoublons;
+  dessinerDoublons();
+}
+
+/* =========================================================
+   16. EXPORTS CSV (agrégés, non nominatifs)
+   ========================================================= */
+function telecharger(nom, contenu, type){
+  const blob = new Blob(["\uFEFF"+contenu], {type:(type||"text/csv")+";charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = nom;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+function versCSV(entetes, lignes){
+  const esc = v => { v=(v==null?"":String(v)); return /[";\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  return [entetes.map(esc).join(";")].concat(lignes.map(l=>l.map(esc).join(";"))).join("\n");
+}
+function exportCSV(quoi){
+  const R = actifs(DS_A), n = R.length, an = DS_A.rentree;
+  let csv="", nom="";
+  if(quoi==="divisions"){
+    nom=`effectifs-divisions-${an}.csv`;
+    csv=versCSV(["Division","Libellé","Filière","Cycle","Formation","Effectif","Seuil 1","Seuil 2","Seuil 3","Seuils franchis","Dont recrutement interne"],
+      divisions(R).map(d=>[d.code,d.lib,d.filiere,d.cycle,d.formation,d.eff,d.seuils[0],d.seuils[1],d.seuils[2],
+        d.seuils.filter(s=>d.eff>=s).length, d.eleves.filter(r=>r._interne).length]));
+  } else if(quoi==="communes"){
+    nom=`communes-origine-${an}.csv`;
+    csv=versCSV(["Commune","Département","Élèves","Part (%)","Distance (km)"],
+      agregCommunes(R).map(c=>[c.nom,c.dep||"",c.n,pct(c.n,n),c.dist!=null?Math.round(c.dist):""]));
+  } else if(quoi==="departements"){
+    nom=`departements-origine-${an}.csv`;
+    csv=versCSV(["Département","Élèves","Part (%)"], compte(R,r=>r._dep).map(d=>[d.k,d.v,pct(d.v,n)]));
+  } else if(quoi==="etablissements"){
+    nom=`etablissements-origine-${an}.csv`;
+    csv=versCSV(["Établissement d'origine (N-1)","Élèves","Part (%)","Interne"],
+      compte(R,r=>r._etabOrig).map(e=>[e.k,e.v,pct(e.v,n), estNous(e.k)?"oui":"non"]));
+  } else if(quoi==="profil"){
+    nom=`profil-inscrits-${an}.csv`;
+    const l=[];
+    compte(R,r=>r.regime).forEach(x=>l.push(["Régime",x.k,x.v,pct(x.v,n)]));
+    compte(R,r=>r.sexe).forEach(x=>l.push(["Sexe",x.k,x.v,pct(x.v,n)]));
+    compte(R,r=>r._age!=null?r._age+" ans":null).forEach(x=>l.push(["Âge",x.k,x.v,pct(x.v,n)]));
+    compte(R,r=>r.resp1Grp).forEach(x=>l.push(["CSP responsable 1",x.k,x.v,pct(x.v,n)]));
+    compte(R,r=>r._cycle).forEach(x=>l.push(["Cycle",x.k,x.v,pct(x.v,n)]));
+    compte(R,r=>r._tronc).forEach(x=>l.push(["Tronc",x.k,x.v,pct(x.v,n)]));
+    csv=versCSV(["Dimension","Modalité","Élèves","Part (%)"], l);
+  }
+  if(csv) telecharger(nom, csv);
+}
+
+/* =========================================================
+   17. ORCHESTRATION
+   ========================================================= */
+/* =========================================================
+   ÉCRAN DE DÉMARRAGE
+   ========================================================= */
+let DEMARRE = false;
+function rendreChecklist(){
+  const recent = SERIE.length ? SERIE[SERIE.length-1] : null;
+  const anciens = SERIE.length - (recent ? 1 : 0);
+  const nGeo = Object.keys(GEO).length - Object.keys(GEO_EMBARQUE).length;
+  const seuilsPerso = Object.keys(SEUILS).length;
+  const items = [
+    {ok: !!recent,
+     l: "Export de la rentrée à analyser",
+     d: recent ? `${recent.rentree}‑${recent.rentree+1} · ${recent.records.length} lignes` : "en attente"},
+    {ok: anciens > 0,
+     l: "Rentrées précédentes (facultatif)",
+     d: anciens > 0 ? `${anciens} millésime(s) · depuis ${SERIE[0].rentree}` : "aucune — l'évolution demande au moins deux rentrées"},
+    {ok: !!(ETAB.uai || (ETAB.nom && ETAB.nom !== "—")),
+     l: "Établissement identifié",
+     d: (ETAB.nom && ETAB.nom !== "—") ? `${ETAB.nom}${ETAB.uai? " · "+ETAB.uai : ""}` : "déduit des colonnes UAI de l'export"},
+    {ok: seuilsPerso > 0,
+     l: "Seuils de dédoublement",
+     d: seuilsPerso > 0 ? `${SEUILS_DEFAUT.join(" / ")} · ${seuilsPerso} exception(s)` : SEUILS_DEFAUT.join(" / ") + " par défaut"},
+    {ok: nGeo > 0,
+     l: "Référentiel géographique",
+     d: nGeo > 0 ? `${nGeo} communes en cache` : "bassin proche seulement — à compléter dans l'onglet Bassin"}
+  ];
+  $("#checklist").innerHTML = items.map(i=>
+    `<li class="${i.ok?"ok":""}"><span class="puce">${i.ok?"●":"○"}</span><span>${i.l}</span><span class="det">${i.d}</span></li>`).join("");
+  $("#btn-commencer").disabled = !recent;
+  $("#btn-commencer").textContent = recent ? "Ouvrir le tableau de bord →" : "Chargez d'abord un export";
+}
+function demarrer(){
+  DEMARRE = true;
+  $("#accueil").hidden = true;
+  $("#nav").hidden = false;
+  document.querySelector("main").hidden = false;
+  allerA("apercu");
+}
+function retourAccueil(){
+  DEMARRE = false;
+  $("#accueil").hidden = false;
+  $("#nav").hidden = true;
+  document.querySelector("main").hidden = true;
+  rendreChecklist();
+}
+
+/* Fichier de réglages : tout ce qui n'est pas nominatif et qu'on ne veut pas resaisir. */
+function exporterReglages(){
+  const cacheGeo = {}; Object.entries(GEO).forEach(([k,v])=>{ if(!GEO_EMBARQUE[k]) cacheGeo[k]=v; });
+  telecharger("reglages-tableau-de-bord.json", JSON.stringify({
+    version: 1,
+    seuilsGeneraux: SEUILS_DEFAUT,
+    seuilsParDivision: SEUILS,
+    etablissement: {uai:ETAB.uai, nom:ETAB.nom, commune:ETAB.commune, lat:ETAB.lat, lon:ETAB.lon},
+    referentielGeo: cacheGeo
+  }, null, 2), "application/json");
+}
+function importerReglages(file){
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const j = JSON.parse(fr.result) || {};
+      let bilan = [];
+      if(Array.isArray(j.seuilsGeneraux) && j.seuilsGeneraux.length === 3){
+        SEUILS_DEFAUT = j.seuilsGeneraux.map(Number);
+        stockEcrire(CLE_SEUILS_GLOB, SEUILS_DEFAUT);
+        bilan.push("seuils " + SEUILS_DEFAUT.join("/"));
+      }
+      if(j.seuilsParDivision && typeof j.seuilsParDivision === "object"){
+        SEUILS = j.seuilsParDivision; stockEcrire(CLE_SEUILS, SEUILS);
+        const n = Object.keys(SEUILS).length;
+        if(n) bilan.push(n + " exception(s)");
+      }
+      if(j.referentielGeo && Object.keys(j.referentielGeo).length){
+        Object.assign(GEO, j.referentielGeo);
+        stockEcrire(CLE_GEO, j.referentielGeo);
+        GEO_SOURCE = "réglages importés";
+        bilan.push(Object.keys(j.referentielGeo).length + " communes géolocalisées");
+      }
+      if(j.etablissement && isFinite(j.etablissement.lat)){
+        const tout = stockLire(CLE_ETAB) || {};
+        tout[j.etablissement.uai || j.etablissement.nom] = {
+          commune:j.etablissement.commune, lat:j.etablissement.lat, lon:j.etablissement.lon};
+        stockEcrire(CLE_ETAB, tout);
+        bilan.push("position de l'établissement");
+        if(DS_A) definirEtab(DS_A, FILTRES.etab==="ALL"? null : FILTRES.etab);
+      }
+      const cible = DEMARRE ? $("#msg-reglages-onglet") : $("#msg-reglages");
+      cible.innerHTML = bilan.length
+        ? "✓ réglages repris : " + bilan.join(", ")
+        : "<span style=\"color:var(--rouge)\">Ce fichier ne contient aucun réglage reconnu.</span>";
+      if(DS_A) toutRendre();
+      rendreChecklist();
+    }catch(e){
+      (DEMARRE ? $("#msg-reglages-onglet") : $("#msg-reglages")).innerHTML = "<span style=\"color:var(--rouge)\">Fichier de réglages illisible.</span>";
+    }
+  };
+  fr.readAsText(file);
+}
+
+function allerA(id){
+  $$("#nav button").forEach(b=>b.classList.toggle("actif", b.dataset.tab===id));
+  $$(".tab").forEach(s=>s.classList.toggle("actif", s.id===id));
+  if(id==="bassin" && DS_A) rendreBassin();
+}
+$$("#nav button").forEach(b=>b.onclick=()=>allerA(b.dataset.tab));
+
+function toutRendre(){
+  if(!DS_A) return;
+  $("#apercu-vide").hidden = true;
+  $("#apercu-contenu").hidden = false;
+  $("#badge-etat").className = "badge";
+  $("#badge-etat").textContent = `${DS_A.records.length} lignes · rentrée ${DS_A.rentree}`;
+  rendreFiltres();
+  rendreApercu();
+  rendreDivisions();
+  rendreProfil();
+  rendreQualite();
+  rendreEvolution();
+  rendreChecklist();
+  if($("#bassin").classList.contains("actif")) rendreBassin();
+}
+
+function rendreDiagnostic(diag, erreur){
+  const d = $("#diagnostic"); d.hidden = false;
+  const l = [
+    ["Fichier", diag.nomFichier || "—"],
+    ["Format détecté", diag.format || "texte"],
+    ["Encodage détecté", diag.encodage || "—"],
+    ["Séparateur retenu", diag.separateur || "—"],
+    ["Ligne d'en-tête", diag.ligneEntete!=null ? "ligne " + diag.ligneEntete : "—"],
+    ["Réglages forcés", diag.force || "non"],
+    ["Colonnes dans l'en-tête", diag.nbColonnes!=null ? diag.nbColonnes : "—"],
+    ["Colonnes FRÉGATA reconnues", diag.colonnesReconnues!=null ? diag.colonnesReconnues : "—"],
+    ["Lignes dans le fichier", diag.nbLignesFichier!=null ? diag.nbLignesFichier : "—"],
+    ["Lignes retenues", diag.lignesRetenues!=null ? diag.lignesRetenues : "—"],
+    ["16 premiers octets", `<code>${diag.apercuHex || "—"}</code>`]
+  ];
+  const corps =
+    (erreur ? `<div class="note alerte" style="margin-bottom:12px"><b>Lecture interrompue.</b> ${erreur}</div>` : "") +
+    `<table>${l.map(([a,b])=>`<tr><td>${a}</td><td class="num"><b>${b}</b></td></tr>`).join("")}</table>` +
+    ((diag.apercuEntetes && diag.apercuEntetes.length)
+      ? `<div style="font-size:12px;font-weight:600;color:var(--vert-fonce);margin-top:12px">Premiers intitulés lus sur cette ligne</div>
+         <div class="cols">${diag.apercuEntetes.map(h=>`<span class="coltag">${(h||"(vide)").replace(/[<>]/g,"")}</span>`).join("")}</div>`
+      : "");
+  $("#diagnostic-corps").innerHTML = corps;
+  d.open = !!erreur;   // replié quand tout va bien, ouvert quand il faut le lire
+  if(erreur){
+    // le diagnostic doit être sous les yeux, pas à deux écrans plus bas
+    $("#msg-import").innerHTML = `<span style="color:var(--rouge)"><b>Lecture impossible.</b> ${erreur}</span>`;
+    $("#reglages-lecture").hidden = false;
+    d.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+}
+
+let DERNIER_FICHIER = null;
+function lireUn(file, forceSep, forceIdx){
+  return new Promise(resolve=>{
+    const fr = new FileReader();
+    fr.onload = () => {
+      try{
+        const {texte, encodage, apercuHex} = decoder(fr.result);
+        const ds = construire(texte, file.name, encodage, apercuHex, forceSep || null,
+                              (forceIdx===""||forceIdx==null) ? null : +forceIdx);
+        resolve({ds});
+      }catch(err){
+        const diag = err.diag || {};
+        diag.nomFichier = diag.nomFichier || file.name;
+        resolve({erreur:err.message, diag});
+      }
+    };
+    fr.readAsArrayBuffer(file);
+  });
+}
+
+function lireFichier(file, cible, forceSep, forceIdx){
+  DERNIER_FICHIER = file;
+  lireUn(file, forceSep, forceIdx).then(res=>{
+    if(res.erreur){
+      rendreDiagnostic(res.diag, res.erreur);
+      $("#apercu-vide").hidden = false; $("#apercu-contenu").hidden = true;
+      allerA("donnees");
+      return;
+    }
+    integrer([res.ds]);
+    rendreDiagnostic(res.ds.diag, null);
+    $("#msg-import").innerHTML = `✓ <b>${res.ds.nbLignes} lignes</b> lues · ${res.ds.nbColonnes} colonnes ·
+      encodage ${res.ds.diag.encodage} · séparateur ${res.ds.diag.separateur} ·
+      en-tête en ligne ${res.ds.diag.ligneEntete} ·
+      ${res.ds.trouves.length} colonnes exploitées, ${res.ds.manquants.length} attendues et absentes.`;
+    $("#reglages-lecture").hidden = false;
+    if(DEMARRE) allerA("apercu"); else demarrer();
+  });
+}
+
+/* Ajoute des millésimes à la série. Une rentrée déjà présente est remplacée :
+   recharger un fichier corrigé ne crée pas de doublon. */
+function integrer(liste, annonce){
+  liste.forEach(ds=>{
+    const i = SERIE.findIndex(x=>x.rentree === ds.rentree);
+    if(i >= 0) SERIE[i] = ds; else SERIE.push(ds);
+  });
+  SERIE.sort((a,b)=>a.rentree - b.rentree);
+  const recent = SERIE[SERIE.length-1];
+  if(!DS_A || liste.includes(recent)) DS_A = recent;
+  FILTRES.etab = "ALL";
+  definirEtab(DS_A, null);
+  SERIE.forEach(ds=>majInterne(ds.records));
+  SEUILS = stockLire(CLE_SEUILS) || {};
+  toutRendre();
+}
+
+async function lireSerie(files){
+  const msg = $("#msg-serie");   // la checklist de l'accueil se redessine seule, ne pas écrire dedans
+  const ok = [], ko = [];
+  for(let i=0;i<files.length;i++){
+    if(DEMARRE) msg.textContent = `Lecture ${i+1}/${files.length} — ${files[i].name}…`;
+    else $("#btn-commencer").textContent = `Lecture ${i+1}/${files.length}…`;
+    const res = await lireUn(files[i]);
+    if(res.erreur) ko.push(`${files[i].name} : ${res.erreur}`); else ok.push(res.ds);
+  }
+  if(ok.length) integrer(ok);
+  const texte = `✓ ${ok.length} millésime(s) ajouté(s)` +
+    (ko.length ? `<br><span style="color:var(--rouge)">${ko.length} fichier(s) non lus — ${ko.join(" · ")}</span>` : "");
+  msg.innerHTML = texte;
+  rendreChecklist();
+  if(ko.length && !DEMARRE) $("#msg-reglages").innerHTML =
+    `<span style="color:var(--rouge)">${ko.length} fichier(s) non lus — ${ko.join(" · ")}</span>`;
+  else if(!DEMARRE) $("#msg-reglages").innerHTML = "";
+  if(DEMARRE) allerA("compare");
+}
+
+$("#imp-a").onchange = e => { if(e.target.files[0]) lireFichier(e.target.files[0], "A",
+    $("#f-sep").value || null, $("#f-entete").value); };
+$("#btn-relire").onclick = () => {
+  if(!DERNIER_FICHIER){ $("#msg-import").textContent = "Choisissez d'abord un fichier."; return; }
+  lireFichier(DERNIER_FICHIER, "A", $("#f-sep").value || null, $("#f-entete").value);
+};
+$("#imp-serie").onchange = e => { if(e.target.files.length) lireSerie(Array.from(e.target.files)); };
+$("#imp-accueil").onchange = e => { if(e.target.files.length) lireSerie(Array.from(e.target.files)); };
+$("#imp-reglages").onchange = e => { if(e.target.files[0]) importerReglages(e.target.files[0]); };
+$("#zone-exports").onclick = e => { if(e.target.tagName !== "INPUT") $("#imp-accueil").click(); };
+[["zone-exports", f=>lireSerie(f)]].forEach(([id, action])=>{
+  const z = document.getElementById(id);
+  ["dragenter","dragover"].forEach(ev=>z.addEventListener(ev, e=>{e.preventDefault();z.classList.add("survol");}));
+  ["dragleave","drop"].forEach(ev=>z.addEventListener(ev, e=>{e.preventDefault();z.classList.remove("survol");}));
+  z.addEventListener("drop", e=>{ if(e.dataTransfer.files.length) action(Array.from(e.dataTransfer.files)); });
+});
+$("#btn-commencer").onclick = demarrer;
+$("#imp-geo").onchange = e => { if(e.target.files[0]) importerGeoCSV(e.target.files[0]); };
+$("#btn-geo").onclick = completerGeo;
+$("#sel-vue").onchange = () => { if(DS_A) rendreBassin(); };
+$("#imp-seuils").onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const fr = new FileReader();
+  fr.onload = () => { try{
+      const j = JSON.parse(fr.result) || {};
+      if(Array.isArray(j.generaux) && j.generaux.length === 3) SEUILS_DEFAUT = j.generaux.map(Number);
+      SEUILS = j.parDivision || (Array.isArray(j) ? {} : j);   // accepte aussi l'ancien format
+      stockEcrire(CLE_SEUILS, SEUILS); stockEcrire(CLE_SEUILS_GLOB, SEUILS_DEFAUT);
+      rendreDivisions();
+    }catch(x){} };
+  fr.readAsText(f);
+};
+const dep = $("#depot");
+["dragenter","dragover"].forEach(ev=>dep.addEventListener(ev, e=>{e.preventDefault();dep.classList.add("survol");}));
+["dragleave","drop"].forEach(ev=>dep.addEventListener(ev, e=>{e.preventDefault();dep.classList.remove("survol");}));
+dep.addEventListener("drop", e=>{ const f=e.dataTransfer.files[0]; if(f) lireFichier(f,"A"); });
+const depS = $("#depot-serie");
+["dragenter","dragover"].forEach(ev=>depS.addEventListener(ev, e=>{e.preventDefault();depS.classList.add("survol");}));
+["dragleave","drop"].forEach(ev=>depS.addEventListener(ev, e=>{e.preventDefault();depS.classList.remove("survol");}));
+depS.addEventListener("drop", e=>{ if(e.dataTransfer.files.length) lireSerie(Array.from(e.dataTransfer.files)); });
+
+chargerGeo();
+signalerLibs();
+SEUILS = stockLire(CLE_SEUILS) || {};
+SEUILS_DEFAUT = stockLire(CLE_SEUILS_GLOB) || SEUILS_DEFAUT;
+rendreChecklist();
+window.__tdb = () => ({DS_A, SERIE, FILTRES, actifs:actifs(DS_A)});   // crochet de vérification
+</script>
+</body>
+</html>
