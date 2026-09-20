@@ -97,25 +97,6 @@
     margin:.35rem 0 0;
   }
 
-  /* ---------- Filtres ---------- */
-  .filtres{
-    display:flex;flex-wrap:wrap;gap:.4rem;
-    padding-bottom:1.1rem;
-    border-bottom:1px solid var(--reglure);
-  }
-  .filtre{
-    font-family:var(--mono);font-size:.73rem;letter-spacing:.03em;
-    color:var(--gris);background:rgba(250,248,242,.8);
-    border:1px solid var(--reglure);border-radius:0;
-    padding:.35rem .75rem;cursor:pointer;
-    transition:border-color .15s,color .15s,background .15s;
-  }
-  .filtre:hover{border-color:var(--gris-clair);color:var(--encre)}
-  .filtre[aria-pressed="true"]{
-    background:var(--encre);border-color:var(--encre);color:var(--papier);
-  }
-  .filtre:focus-visible{outline:2px solid var(--plan);outline-offset:2px}
-
   /* ---------- Liste ---------- */
   .liste{list-style:none;margin:0;padding:0}
   .outil{border-bottom:1px solid var(--reglure)}
@@ -193,10 +174,6 @@
   </div>
 </header>
 
-<nav class="enveloppe" aria-label="Filtrer par domaine">
-  <div class="filtres" id="filtres"></div>
-</nav>
-
 <main class="enveloppe">
   <ul class="liste" id="liste"></ul>
   <p class="vide" id="vide" hidden>Aucun outil dans ce domaine pour le moment.</p>
@@ -208,10 +185,7 @@
 </footer>
 
 <script>
-const LIBELLES = {"en-ligne":"En ligne","en-test":"En test","a-venir":"À venir"};
-
 let donnees = null;
-let filtreActif = "tous";
 
 function echapper(s){
   return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -238,29 +212,12 @@ function rendreEntete(){
   document.getElementById("ident-detail").textContent = detail;
 }
 
-function rendreFiltres(){
-  const cats = [...new Set(donnees.outils.map(o=>o.categorie).filter(Boolean))].sort();
-  const box = document.getElementById("filtres");
-  box.innerHTML = "";
-  [["tous","Tous"], ...cats.map(c=>[c,c])].forEach(([val,lib])=>{
-    const b = document.createElement("button");
-    b.className = "filtre"; b.type = "button"; b.textContent = lib;
-    b.setAttribute("aria-pressed", String(val === filtreActif));
-    b.addEventListener("click", ()=>{ filtreActif = val; rendreFiltres(); rendreListe(); });
-    box.appendChild(b);
-  });
-}
-
 function rendreListe(){
   const visibles = donnees.outils
-    .filter(o => filtreActif === "tous" || o.categorie === filtreActif)
+    .slice()
     .sort((a,b) => (b.date||"").localeCompare(a.date||""));
 
-  const total = visibles.length;
-
-  document.getElementById("liste").innerHTML = visibles.map((o,i)=>{
-    const statut = o.statut || "en-ligne";
-    const num = String(i+1).padStart(2,"0") + " / " + String(total).padStart(2,"0");
+  document.getElementById("liste").innerHTML = visibles.map(o=>{
     const src = o.vignette && o.dossier ? `${o.dossier}/${o.vignette}` : o.vignette;
     const visuel = src
       ? `<img class="vignette" src="${echapper(src)}" alt="" loading="lazy">`
@@ -269,11 +226,6 @@ function rendreListe(){
     const corps = `
       ${visuel}
       <div class="contenu">
-        <p class="meta">
-          <span>${num}</span><span class="sep">·</span>
-          <span>${echapper(o.categorie||"")}</span><span class="sep">·</span>
-          <span class="badge ${echapper(statut)}">${echapper(LIBELLES[statut]||statut)}</span>
-        </p>
         <h2>${echapper(o.titre)}${destination(o)?' <span class="fleche" aria-hidden="true">&rarr;</span>':''}</h2>
         <p>${echapper(o.description||"")}</p>
         ${o.usage ? `<p class="usage">${echapper(o.usage)}</p>` : ""}
@@ -297,7 +249,7 @@ function rendreListe(){
 
 fetch("outils.json?v=" + Date.now())
   .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
-  .then(d => { donnees = d; rendreEntete(); rendreFiltres(); rendreListe(); })
+  .then(d => { donnees = d; rendreEntete(); rendreListe(); })
   .catch(() => {
     document.getElementById("liste").innerHTML =
       `<li class="vide">La liste des outils n'a pas pu être chargée.
